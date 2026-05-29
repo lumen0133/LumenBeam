@@ -1,0 +1,2226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,maximum-scale=1,viewport-fit=cover" />
+<title>Lumen Beam | Protocol Defense</title>
+<link rel="icon" href="https://i.postimg.cc/g0QywJ0x/1778750934.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- Telegram WebApp SDK -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<!-- Monetag SDK - UPDATED -->
+<script src='//libtl.com/sdk.js' data-zone='11049678' data-sdk='show_11049678'></script>
+<!-- RichInfo Telegram Ads Controller -->
+<script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js"></script>
+<script>
+window.TelegramAdsController = new TelegramAdsController();
+window.TelegramAdsController.initialize({ pubId: "1007736", appId: "6958" });
+</script>
+<!-- Firebase - UPDATED VERSION -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+<!-- TON Connect -->
+<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+<script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
+<style>
+:root {
+--primary: #00f3ff; --primary-glow: rgba(0, 243, 255, 0.4);
+--secondary: #bc13fe; --secondary-glow: rgba(188, 19, 254, 0.4);
+--accent: #ff003c; --accent-glow: rgba(255, 0, 60, 0.4);
+--success: #0aff68; --success-glow: rgba(10, 255, 104, 0.4);
+--warning: #ffee00; --danger: #ff4757;
+--bg-base: #050a14; --bg-surface: rgba(5, 10, 20, 0.85);
+--bg-surface-solid: #0b1221; --bg-card: rgba(11, 18, 33, 0.7);
+--text-primary: #e0f7ff; --text-secondary: rgba(224, 247, 255, 0.7);
+--text-dim: rgba(224, 247, 255, 0.4);
+--border: rgba(0, 243, 255, 0.2); --border-hover: rgba(0, 243, 255, 0.6);
+--glass: blur(16px) saturate(120%);
+--shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.6);
+--shadow-glow: 0 0 25px var(--primary-glow);
+--shadow-glow-lg: 0 0 50px var(--primary-glow), 0 0 80px var(--secondary-glow);
+--radius-sm: 4px; --radius-md: 12px; --radius-lg: 20px; --radius-full: 9999px;
+--transition-fast: 150ms ease; --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+--transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* LIGHT THEME OVERRIDES */
+html.light-theme {
+--bg-base: #f4f6f8; --bg-surface: rgba(255, 255, 255, 0.9);
+--bg-surface-solid: #ffffff; --bg-card: rgba(255, 255, 255, 0.75);
+--text-primary: #1a1a2e; --text-secondary: rgba(26, 26, 46, 0.7);
+--text-dim: rgba(26, 26, 46, 0.5);
+--border: rgba(0, 100, 150, 0.25); --border-hover: rgba(0, 100, 150, 0.6);
+}
+html.light-theme #bg-animation,
+html.light-theme .scanlines,
+html.light-theme .glow-overlay,
+html.light-theme #particles { display: none !important; }
+html.light-theme .hud-dock { background: var(--bg-surface); border-color: var(--border); box-shadow: 0 -8px 24px rgba(0,0,0,0.08); }
+html.light-theme .modal-overlay, html.light-theme .wallet-modal { background: rgba(240,240,240,0.85); }
+html.light-theme .modal-content, html.light-theme .wallet-modal-content { background: var(--bg-surface-solid); border-color: var(--border); }
+html.light-theme .cyber-btn { background: rgba(0, 243, 255, 0.15); }
+html.light-theme .task-card, html.light-theme .module-card, html.light-theme .nft-card, html.light-theme .owned-module-card, html.light-theme .block-cell { background: var(--bg-surface-solid); }
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+::selection { background: var(--primary); color: #000; }
+html, body {
+background: var(--bg-base); color: var(--text-primary); font-family: 'Rajdhani', sans-serif;
+overflow-x: hidden; min-height: 100vh; scroll-behavior: smooth; transition: background 0.3s ease, color 0.3s ease;
+}
+/* GLOBAL BOLD TEXT */
+body, input, button, textarea, select, span, div, p, a, h1, h2, h3, h4, h5, h6, li, td, th, label {
+    font-weight: 700 !important;
+    letter-spacing: 0.5px;
+}
+.stat-value, .card-title, .wallet-balance-amount, .welcome-title { font-weight: 800 !important; }
+
+#bg-animation {
+position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+background: radial-gradient(ellipse at 20% 80%, rgba(0, 243, 255, 0.08) 0%, transparent 55%),
+radial-gradient(ellipse at 80% 20%, rgba(188, 19, 254, 0.08) 0%, transparent 55%),
+radial-gradient(ellipse at 50% 50%, rgba(255, 0, 60, 0.04) 0%, transparent 75%),
+linear-gradient(160deg, #050a14 0%, #0b1221 45%, #050a14 100%); transition: background 0.3s ease;
+}
+#particles {
+position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
+}
+.particle {
+position: absolute; width: 4px; height: 4px; background: var(--primary); border-radius: 50%;
+opacity: 0.7; animation: float 16s infinite linear; box-shadow: 0 0 12px var(--primary-glow);
+}
+.particle:nth-child(odd) { background: var(--secondary); box-shadow: 0 0 12px var(--secondary-glow); animation-duration: 20s; }
+.particle:nth-child(3n) { background: var(--accent); box-shadow: 0 0 12px var(--accent-glow); animation-duration: 24s; }
+@keyframes float {
+0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+10% { opacity: 0.7; } 90% { opacity: 0.7; }
+100% { transform: translateY(-100vh) rotate(540deg); opacity: 0; }
+}
+.scanlines {
+position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+background-size: 100% 3px, 3px 100%; pointer-events: none; opacity: 0.3; transition: opacity 0.3s ease;
+}
+.glow-overlay {
+position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+background: radial-gradient(circle at 50% 120%, rgba(0,243,255,0.06) 0%, transparent 60%);
+pointer-events: none; z-index: -1; animation: pulseGlow 8s ease-in-out infinite;
+}
+@keyframes pulseGlow { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.9; } }
+.app-container {
+display: flex; flex-direction: column; min-height: 100vh;
+padding: env(safe-area-inset-top) 20px calc(90px + env(safe-area-inset-bottom)) 20px;
+position: relative; z-index: 10; max-width: 520px; margin: 0 auto; width: 100%;
+transition: opacity var(--transition-normal), transform var(--transition-normal);
+will-change: opacity, transform;
+}
+.app-container.transitioning { opacity: 0.7; transform: scale(0.98); pointer-events: none; }
+.hud-header {
+display: flex; justify-content: space-between; align-items: center;
+padding: 12px 0; margin-bottom: 16px; border-bottom: 1px solid var(--border);
+}
+.mint-btn {
+background: linear-gradient(135deg, rgba(0, 243, 255, 0.2), rgba(188, 19, 254, 0.2));
+border: 1px solid var(--primary); color: var(--primary); font-family: 'Orbitron', sans-serif;
+font-size: 11px; padding: 8px 16px; border-radius: var(--radius-md);
+cursor: pointer; transition: var(--transition-fast); text-transform: uppercase; letter-spacing: 1px;
+}
+.mint-btn:hover { box-shadow: 0 0 18px var(--primary-glow); transform: translateY(-1px); }
+.connection-status {
+display: flex; align-items: center; gap: 8px; font-size: 10px; color: var(--success);
+background: rgba(10, 255, 104, 0.1); padding: 4px 12px; border-radius: var(--radius-full);
+border: 1px solid rgba(10, 255, 104, 0.3); text-transform: uppercase; letter-spacing: 1px;
+}
+.status-dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; box-shadow: 0 0 8px var(--success); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.75; transform: scale(0.92); } }
+.view-section {
+display: none; flex-direction: column; padding-bottom: 24px;
+animation: slideUp 400ms cubic-bezier(0.16, 1, 0.3, 1); gap: 16px;
+transform: translateZ(0); will-change: transform, opacity;
+}
+.view-section.active { display: flex; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+.cyber-card {
+background: var(--bg-card); backdrop-filter: var(--glass); -webkit-backdrop-filter: var(--glass);
+border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px;
+position: relative; overflow: hidden; transition: var(--transition-normal);
+box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 0 1px rgba(0,243,255,0.3);
+}
+.cyber-card::before {
+content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent); opacity: 0.65;
+}
+.cyber-card:hover { border-color: var(--border-hover); box-shadow: var(--shadow-glow); transform: translateY(-2px); }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.card-title {
+font-family: 'Orbitron', sans-serif; font-size: 14px; color: var(--primary);
+text-transform: uppercase; letter-spacing: 1.5px; display: flex; align-items: center; gap: 8px;
+}
+.card-title::before { content: '⚡'; width: auto; height: 14px; background: transparent; border-radius: 2px; }
+.stat-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.stat-value {
+font-family: 'Orbitron', sans-serif; font-size: 32px;
+background: linear-gradient(135deg, var(--primary), var(--accent));
+-webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+line-height: 1; text-shadow: 0 0 28px var(--primary-glow);
+}
+.stat-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; }
+.cyber-btn {
+background: linear-gradient(135deg, rgba(0, 243, 255, 0.12), rgba(188, 19, 254, 0.12));
+border: 1px solid var(--primary); color: var(--primary); font-family: 'Orbitron', sans-serif;
+font-size: 12px; padding: 14px 24px; width: 100%; text-transform: uppercase;
+letter-spacing: 1.5px; cursor: pointer; position: relative; overflow: hidden; border-radius: var(--radius-sm);
+transition: var(--transition-normal); display: flex; align-items: center; justify-content: center; gap: 8px;
+clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+/* 3D & Shape Enhancements */
+transform: translateY(0);
+box-shadow: 0 6px 0 rgba(0, 0, 0, 0.4), 0 10px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+.cyber-btn::before {
+content: ''; position: absolute; inset: 0;
+background: linear-gradient(135deg, var(--primary), var(--secondary));
+opacity: 0; transition: var(--transition-fast); z-index: -1;
+}
+.cyber-btn::after {
+content: ''; position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px;
+border-radius: var(--radius-sm);
+background: linear-gradient(135deg, rgba(0,243,255,0.15), rgba(188,19,254,0.15));
+box-shadow: inset 0 2px 4px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.3);
+pointer-events: none; z-index: 0;
+}
+.cyber-btn:hover:not(:disabled) { filter: brightness(1.15); box-shadow: 0 0 32px var(--primary-glow), 0 8px 0 rgba(0,0,0,0.3); }
+.cyber-btn:hover:not(:disabled)::before { opacity: 1; }
+.cyber-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+.cyber-btn:disabled { border-color: var(--text-dim); color: var(--text-dim); background: rgba(255, 255, 255, 0.06); cursor: not-allowed; box-shadow: none; transform: translateY(0); }
+.cyber-btn.secondary { border-color: var(--secondary); color: var(--secondary); }
+.cyber-btn.secondary::before { background: linear-gradient(135deg, var(--secondary), var(--accent)); }
+.cyber-btn.secondary::after { background: linear-gradient(135deg, rgba(188,19,254,0.15), rgba(255,0,60,0.15)); }
+.cyber-btn.success { border-color: var(--success); color: var(--success); }
+.cyber-btn.success::before { background: linear-gradient(135deg, var(--success), #0aff68); }
+.cyber-btn.success::after { background: linear-gradient(135deg, rgba(10,255,104,0.15), rgba(0,243,255,0.15)); }
+
+.hud-dock {
+position: fixed; bottom: calc(16px + env(safe-area-inset-bottom)); left: 50%;
+transform: translateX(-50%); width: 96%; max-width: 520px; height: 72px;
+background: var(--bg-surface); backdrop-filter: var(--glass); -webkit-backdrop-filter: var(--glass);
+border: 1px solid var(--border); border-radius: var(--radius-lg); display: flex;
+justify-content: space-around; align-items: center; z-index: 1000;
+box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 42px rgba(0, 243, 255, 0.15), inset 0 1px 0 rgba(255,255,255,0.05); padding: 0 8px;
+}
+.hud-item {
+display: flex; flex-direction: column; align-items: center; gap: 4px;
+color: var(--text-dim); cursor: pointer; transition: var(--transition-fast);
+padding: 6px 2px; border-radius: var(--radius-md); position: relative;
+}
+.hud-item svg { width: 20px; height: 20px; fill: currentColor; transition: var(--transition-fast); }
+.hud-item span { font-size: 9px; font-family: 'Rajdhani', sans-serif; letter-spacing: 0.5px; text-transform: uppercase; }
+.hud-item:hover { color: var(--text-secondary); }
+.hud-item.active { color: var(--primary); }
+.hud-item.active svg { filter: drop-shadow(0 0 9px var(--primary-glow)); transform: scale(1.12); }
+.hud-item.active::after {
+content: ''; position: absolute; bottom: -4px; width: 26px; height: 3px;
+background: var(--primary); border-radius: var(--radius-full); box-shadow: 0 0 11px var(--primary-glow);
+}
+/* DEFENSE GRID */
+.defense-grid-wrapper {
+background: var(--bg-card); backdrop-filter: var(--glass); -webkit-backdrop-filter: var(--glass);
+border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px;
+position: relative; overflow: hidden;
+box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 0 1px rgba(0,243,255,0.3);
+}
+.defense-grid-wrapper::before {
+content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--success));
+}
+.grid-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.grid-title { font-family: 'Orbitron', sans-serif; font-size: 16px; color: var(--text-primary); }
+.total-mining-rate {
+font-size: 12px; color: var(--primary);
+background: rgba(0, 243, 255, 0.12); padding: 6px 12px; border-radius: var(--radius-full);
+}
+.defense-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+.defense-slot {
+background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border);
+border-radius: var(--radius-md); padding: 16px; text-align: center;
+position: relative; transition: var(--transition-normal); cursor: pointer;
+}
+.defense-slot.active {
+border-color: var(--primary); background: rgba(0, 243, 255, 0.08);
+box-shadow: 0 0 20px var(--primary-glow);
+}
+.defense-slot.empty { border-style: dashed; opacity: 0.6; cursor: pointer; }
+.defense-slot.empty:hover { border-color: var(--accent); opacity: 0.8; }
+.defense-slot-icon {
+width: 36px; height: 36px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center;
+filter: drop-shadow(0 0 10px var(--primary-glow));
+animation: moduleFloat 3s ease-in-out infinite;
+}
+.defense-slot-icon svg { width: 100%; height: 100%; }
+.defense-slot-icon img { width: 100%; height: 100%; object-fit: contain; }
+@keyframes moduleFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.defense-slot-name { font-size: 11px; color: var(--text-primary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.defense-slot-rate { font-size: 10px; color: var(--primary); font-family: 'Orbitron', sans-serif; }
+.defense-slot-badge {
+position: absolute; top: 6px; right: 6px; background: var(--success);
+color: #000; font-size: 8px; padding: 2px 6px; border-radius: var(--radius-full); text-transform: uppercase;
+}
+@keyframes equipPulse {
+0% { transform: scale(1); box-shadow: 0 0 20px var(--primary-glow); }
+50% { transform: scale(1.05); box-shadow: 0 0 40px var(--primary-glow), 0 0 60px var(--accent-glow); }
+100% { transform: scale(1); box-shadow: 0 0 20px var(--primary-glow); }
+}
+.defense-slot.equipping { animation: equipPulse 0.6s ease-in-out; }
+/* MODULE STORE */
+.module-store-header {
+background: linear-gradient(135deg, rgba(188, 89, 254, 0.22), rgba(0, 243, 255, 0.22));
+border: 1px solid var(--border); border-radius: var(--radius-md);
+padding: 16px 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;
+}
+.module-balance-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+.module-balance-value { font-size: 20px; color: var(--secondary); font-family: 'Orbitron', sans-serif; }
+.module-section-title {
+font-family: 'Orbitron', sans-serif; font-size: 16px; color: var(--text-primary); margin: 20px 0 12px; display: flex; align-items: center; gap: 8px;
+}
+.module-section-title::before { content: '🔧'; }
+.owned-modules-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
+.owned-module-card {
+background: var(--bg-surface-solid); border: 1px solid var(--border); border-radius: var(--radius-md);
+padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+transition: var(--transition-normal); position: relative;
+box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.owned-module-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,0.42); }
+.owned-module-card.equipped { border-color: var(--success); box-shadow: 0 0 16px var(--success-glow); background: rgba(10, 204, 113, 0.06); }
+.owned-module-badge {
+position: absolute; top: 8px; right: 8px; background: var(--success); color: #000; font-size: 9px;
+padding: 3px 8px; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.5px; display: none;
+}
+.owned-module-card.equipped .owned-module-badge { display: block; }
+.owned-module-icon { width: 40px; height: 40px; margin-bottom: 4px; animation: moduleBounce 2s ease-in-out infinite; }
+.owned-module-icon svg { width: 100%; height: 100%; }
+@keyframes moduleBounce {
+0%, 100% { transform: scale(1) rotate(0deg); }
+25% { transform: scale(1.1) rotate(-5deg); }
+50% { transform: scale(1) rotate(0deg); }
+75% { transform: scale(1.1) rotate(5deg); }
+}
+.owned-module-name { font-size: 12px; color: var(--text-primary); text-align: center; line-height: 1.3; }
+.module-actions { display: flex; gap: 8px; width: 100%; }
+.equip-btn, .unequip-btn {
+flex: 1; padding: 8px; border-radius: var(--radius-full); font-family: 'Rajdhani', sans-serif; font-size: 11px;
+cursor: pointer; transition: var(--transition-fast); text-transform: uppercase; letter-spacing: 0.5px;
+transform: translateY(0); box-shadow: 0 4px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.equip-btn { background: rgba(0, 243, 255, 0.18); border: 1px solid var(--primary); color: var(--primary); }
+.equip-btn:hover:not(:disabled) { background: var(--primary); color: #000; }
+.equip-btn.equipped { background: var(--success); border-color: var(--success); color: #000; pointer-events: none; }
+.unequip-btn { background: rgba(255, 0, 60, 0.18); border: 1px solid var(--danger); color: var(--danger); }
+.unequip-btn:hover:not(:disabled) { background: var(--danger); color: #fff; }
+.equip-btn:active, .unequip-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
+
+.module-card {
+background: var(--bg-surface-solid); border: 1px solid var(--border); border-radius: var(--radius-md);
+padding: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 14px;
+transition: var(--transition-normal); cursor: pointer;
+animation: moduleCardEntrance 0.5s ease forwards; opacity: 0;
+box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+@keyframes moduleCardEntrance { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.module-card:nth-child(1) { animation-delay: 0.05s; }
+.module-card:nth-child(2) { animation-delay: 0.1s; }
+.module-card:nth-child(3) { animation-delay: 0.15s; }
+.module-card:nth-child(4) { animation-delay: 0.2s; }
+.module-card:nth-child(5) { animation-delay: 0.25s; }
+.module-card:hover { border-color: var(--primary); transform: translateX(4px); box-shadow: var(--shadow-glow); }
+.module-icon { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); border-radius: var(--radius-sm); animation: modulePulse 2.5s ease-in-out infinite; }
+.module-icon svg { width: 70%; height: 70%; }
+@keyframes modulePulse { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.05); filter: brightness(1.2); } }
+.module-info { flex: 1; }
+.module-tier { font-family: 'Orbitron', sans-serif; font-size: 13px; color: var(--text-primary); margin-bottom: 4px; }
+.module-desc { font-size: 11px; color: var(--text-dim); line-height: 1.4; }
+.module-stats { display: flex; gap: 8px; margin-top: 6px; }
+.module-stat { font-size: 10px; color: var(--secondary); background: rgba(188, 89, 254, 0.18); padding: 2px 8px; border-radius: 99px; }
+.module-buy-btn {
+padding: 8px 16px; background: rgba(0, 243, 255, 0.18); border: 1px solid var(--primary); color: var(--primary);
+border-radius: var(--radius-full); font-family: 'Rajdhani', sans-serif; font-size: 11px;
+cursor: pointer; transition: var(--transition-fast); text-transform: uppercase; letter-spacing: 0.5px;
+transform: translateY(0); box-shadow: 0 4px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.module-buy-btn:hover:not(:disabled) { background: var(--primary); color: white; box-shadow: 0 0 22px var(--primary-glow); }
+.module-buy-btn:disabled { background: rgba(255,255,255,0.06); border-color: var(--text-dim); color: var(--text-dim); cursor: not-allowed; transform: translateY(0); box-shadow: none; }
+.module-buy-btn.owned { background: rgba(10, 204, 113, 0.18); border-color: var(--success); color: var(--success); }
+.module-buy-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
+
+.back-btn {
+display: flex; align-items: center; gap: 6px; padding: 10px 16px; background: var(--bg-card); border: 1px solid var(--border);
+border-radius: var(--radius-full); color: var(--text-primary); font-family: 'Rajdhani', sans-serif; font-size: 11px;
+cursor: pointer; transition: var(--transition-fast); margin-bottom: 16px;
+transform: translateY(0); box-shadow: 0 4px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.back-btn:hover { border-color: var(--primary); color: var(--primary); }
+.back-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); }
+
+/* TASKS */
+.task-card {
+display: flex; align-items: center; gap: 14px; background: var(--bg-surface-solid); border: 1px solid var(--border);
+padding: 16px; border-radius: var(--radius-md); transition: var(--transition-fast); cursor: pointer;
+box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.task-card:hover { border-color: var(--border-hover); transform: translateX(4px); }
+.task-image {
+width: 52px; height: 52px; border-radius: var(--radius-sm); object-fit: cover;
+border: 2px solid var(--primary); box-shadow: 0 0 16px var(--primary-glow);
+}
+.task-content { flex: 1; }
+.task-title { font-family: 'Rajdhani', sans-serif; font-size: 14px; color: var(--text-primary); }
+.task-desc { font-size: 12px; color: var(--primary); margin-top: 2px; }
+.task-action {
+padding: 8px 18px; background: var(--bg-card); border: 1px solid var(--secondary); color: var(--secondary);
+border-radius: var(--radius-full); font-family: 'Rajdhani', sans-serif; font-size: 11px;
+cursor: pointer; transition: var(--transition-fast); text-transform: uppercase; letter-spacing: 0.5px;
+transform: translateY(0); box-shadow: 0 4px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.task-action:hover { background: var(--secondary); color: white; box-shadow: 0 0 22px var(--secondary-glow); }
+.task-action.completed { background: rgba(10, 204, 113, 0.18); border-color: var(--success); color: var(--success); cursor: default; transform: translateY(0); box-shadow: none; }
+.task-action:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
+
+/* ADS */
+.ad-section-big {
+background: var(--bg-card); backdrop-filter: var(--glass); border: 1px solid var(--border);
+border-radius: var(--radius-md); padding: 24px; position: relative; overflow: hidden;
+box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 0 1px rgba(0,243,255,0.3);
+}
+.ad-section-big::before {
+content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--success));
+}
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0; }
+.stat-box {
+background: var(--bg-surface-solid); border-radius: var(--radius-sm); padding: 12px 8px;
+text-align: center; border: 1px solid var(--border); transition: var(--transition-fast);
+box-shadow: 0 4px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.stat-box:hover { border-color: var(--primary); transform: translateY(-2px); }
+.stat-box-label { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.stat-box-value { font-size: 18px; color: var(--primary); font-family: 'Orbitron', sans-serif; }
+/* MODALS */
+.modal-overlay {
+position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 10, 20, 0.92);
+backdrop-filter: blur(10px); z-index: 2000; display: none; align-items: center; justify-content: center;
+padding: 20px; animation: fadeIn 200ms ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-content {
+background: var(--bg-surface-solid); border: 1px solid var(--primary); width: 100%; max-width: 420px;
+padding: 28px 24px; position: relative; box-shadow: var(--shadow-glow-lg), 0 12px 48px rgba(0,0,0,0.8); border-radius: var(--radius-lg);
+max-height: 90vh; overflow-y: auto; animation: modalSlide 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modalSlide { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.modal-close {
+position: absolute; top: 16px; right: 20px; color: var(--text-dim); font-size: 24px; cursor: pointer;
+width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+border-radius: 50%; transition: var(--transition-fast);
+}
+.modal-close:hover { color: var(--primary); background: rgba(0, 243, 255, 0.12); }
+/* WALLET */
+.wallet-balance-card {
+background: linear-gradient(135deg, rgba(0, 243, 255, 0.18), rgba(188, 19, 254, 0.16));
+border-radius: var(--radius-lg); padding: 28px 24px; border: 1px solid var(--border); text-align: center;
+position: relative; overflow: hidden;
+box-shadow: 0 10px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.wallet-balance-card::before {
+content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+background: radial-gradient(circle, rgba(0, 243, 255, 0.12) 0%, transparent 70%); animation: rotate 22s linear infinite;
+}
+@keyframes rotate { 100% { transform: rotate(360deg); } }
+.wallet-balance-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+.wallet-balance-amount {
+font-size: 42px; background: linear-gradient(135deg, var(--primary), var(--accent));
+-webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+line-height: 1; margin-bottom: 8px; text-shadow: 0 0 42px var(--primary-glow);
+}
+.wallet-balance-currency { font-size: 13px; color: var(--text-secondary); letter-spacing: 1px; }
+.wallet-actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+.wallet-action-btn {
+background: var(--bg-surface-solid); border: 1px solid var(--border); border-radius: var(--radius-md);
+padding: 18px 12px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+cursor: pointer; transition: var(--transition-normal);
+transform: translateY(0); box-shadow: 0 6px 0 rgba(0,0,0,0.4), 0 10px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.wallet-action-btn:hover { border-color: var(--primary); background: rgba(0, 243, 255, 0.12); transform: translateY(-3px); box-shadow: 0 10px 32px rgba(0, 243, 255, 0.22), 0 6px 0 rgba(0,0,0,0.3); }
+.wallet-action-icon {
+width: 40px; height: 40px; border-radius: 50%;
+background: linear-gradient(135deg, rgba(0, 243, 255, 0.22), rgba(188, 19, 254, 0.22));
+display: flex; align-items: center; justify-content: center; color: var(--primary);
+}
+.wallet-action-text { font-size: 10px; font-family: 'Rajdhani', sans-serif; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px; }
+.wallet-action-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,0.4), 0 4px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1); }
+
+/* RANKING */
+.ranking-list { display: flex; flex-direction: column; gap: 10px; }
+.ranking-item {
+display: flex; align-items: center; padding: 14px 16px; background: var(--bg-surface-solid);
+border: 1px solid var(--border); border-radius: var(--radius-md); transition: var(--transition-fast);
+box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.ranking-item:hover { transform: translateX(6px); border-color: var(--border-hover); }
+.rank-number { width: 36px; font-family: 'Orbitron', sans-serif; font-size: 18px; text-align: center; color: var(--text-dim); }
+.rank-1 { color: var(--accent); text-shadow: 0 0 16px var(--accent-glow); font-size: 22px; }
+.rank-2 { color: #c0c0c0; text-shadow: 0 0 16px rgba(192, 192, 192, 0.42); font-size: 20px; }
+.rank-3 { color: #cd7f32; text-shadow: 0 0 16px rgba(205, 127, 50, 0.42); font-size: 20px; }
+.rank-avatar { width: 44px; height: 44px; border-radius: 50%; border: 2px solid transparent; margin: 0 14px; object-fit: cover; background: var(--bg-card); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.rank-1 .rank-avatar { border-color: var(--accent); box-shadow: 0 0 16px var(--accent-glow); }
+.rank-2 .rank-avatar { border-color: #c0c0c0; box-shadow: 0 0 16px rgba(192, 192, 192, 0.42); }
+.rank-3 .rank-avatar { border-color: #cd7f32; box-shadow: 0 0 16px rgba(205, 127, 50, 0.42); }
+.rank-info { flex: 1; }
+.rank-name { color: var(--text-primary); font-size: 14px; }
+.rank-score { font-family: 'Orbitron', sans-serif; color: var(--accent); }
+/* REFERRAL WELCOME */
+#referral-welcome {
+position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+background: var(--bg-base); display: none;
+flex-direction: column; align-items: center; justify-content: center; z-index: 9999; padding: 20px; animation: fadeIn 400ms ease;
+}
+.welcome-card {
+background: var(--bg-surface); backdrop-filter: blur(30px); border-radius: var(--radius-lg);
+padding: 36px 32px; border: 1px solid var(--border); box-shadow: var(--shadow-glow-lg);
+text-align: center; max-width: 400px; width: 100%; animation: modalSlide 500ms ease;
+}
+.welcome-title {
+font-size: 26px; background: linear-gradient(135deg, var(--primary), var(--accent));
+-webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px; font-family: 'Orbitron', sans-serif;
+}
+.referrer-info {
+background: rgba(0, 243, 255, 0.12); border-radius: var(--radius-md); padding: 20px; margin: 20px 0; border: 1px solid var(--border);
+}
+.referrer-avatar { width: 56px; height: 56px; border-radius: 50%; border: 3px solid var(--success); box-shadow: 0 0 22px var(--success-glow); object-fit: cover; }
+.referrer-name { font-size: 18px; color: var(--text-primary); margin-top: 12px; }
+/* LOADER */
+#loader {
+position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-base); z-index: 9999;
+display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 400ms ease;
+}
+.loader-spinner {
+width: 60px; height: 60px; border: 3px solid rgba(0, 243, 255, 0.22);
+border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 24px;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+#loader .brand-logo {
+font-size: 24px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center;
+}
+#loader .brand-logo img {
+width: 120px; height: 120px; object-fit: contain; animation: pulseGlow 2s ease-in-out infinite;
+}
+#loaderText { color: var(--text-dim); font-size: 13px; font-family: 'Rajdhani', sans-serif; }
+/* TOAST */
+#toast {
+position: fixed; top: calc(20px + env(safe-area-inset-top)); left: 50%;
+transform: translateX(-50%) translateY(-20px); background: var(--bg-surface-solid); border: 1px solid var(--primary);
+padding: 14px 24px; border-radius: var(--radius-full); z-index: 10000; opacity: 0;
+transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;
+display: flex; align-items: center; gap: 12px; backdrop-filter: blur(20px); box-shadow: var(--shadow-glow); max-width: 90%;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+#toastMsg { font-family: 'Rajdhani', sans-serif; font-size: 13px; }
+/* UTILS */
+.hidden { display: none !important; }
+.text-center { text-align: center; }
+.text-accent { color: var(--accent); }
+.text-dim { color: var(--text-dim); }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.mt-16 { margin-top: 16px; }
+.mb-8 { margin-bottom: 8px; }
+.task-tabs {
+display: flex; gap: 8px; margin-bottom: 16px; background: var(--bg-surface-solid); padding: 6px;
+border-radius: var(--radius-md); border: 1px solid var(--border);
+}
+.task-tab {
+flex: 1; padding: 10px 16px; background: transparent; border: none; border-radius: var(--radius-sm);
+color: var(--text-dim); font-family: 'Rajdhani', sans-serif; font-size: 11px;
+cursor: pointer; transition: var(--transition-fast); text-transform: uppercase; letter-spacing: 0.5px;
+transform: translateY(0); box-shadow: 0 4px 0 rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.task-tab:hover { color: var(--text-secondary); }
+.task-tab.active { background: linear-gradient(135deg, rgba(0, 243, 255, 0.22), rgba(188, 19, 254, 0.22)); color: var(--primary); box-shadow: 0 0 16px var(--primary-glow), 0 4px 0 rgba(0,0,0,0.2); }
+.task-tab:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05); }
+
+.cyber-input {
+width: 100%; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border); color: var(--text-primary);
+padding: 14px 18px; font-family: 'Rajdhani', sans-serif; font-size: 15px; margin-bottom: 14px;
+outline: none; border-radius: var(--radius-sm); transition: var(--transition-fast);
+}
+.cyber-input::placeholder { color: var(--text-dim); }
+.cyber-input:focus { border-color: var(--primary); box-shadow: 0 0 22px var(--primary-glow); background: rgba(0, 243, 255, 0.06); }
+.copy-btn {
+background: rgba(0, 243, 255, 0.18); border: 1px solid var(--primary); color: var(--primary); padding: 8px 16px;
+border-radius: var(--radius-full); font-family: 'Rajdhani', sans-serif; font-size: 10px;
+cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: var(--transition-fast); text-transform: uppercase; letter-spacing: 0.5px;
+transform: translateY(0); box-shadow: 0 4px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.copy-btn:hover { background: var(--primary); color: white; box-shadow: 0 0 22px var(--primary-glow); }
+.copy-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
+
+/* WALLET MODAL */
+.wallet-modal {
+position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 10, 20, 0.88);
+backdrop-filter: blur(15px); z-index: 10001; display: none; align-items: flex-end;
+}
+.wallet-modal-content {
+background: var(--bg-surface-solid); width: 100%; max-width: 480px; margin: 0 auto;
+border-top: 2px solid var(--primary); border-top-left-radius: 28px; border-top-right-radius: 28px;
+padding: 28px 24px 32px; animation: slideUp 300ms cubic-bezier(0.16, 1, 0.3, 1); max-height: 85vh; overflow-y: auto;
+box-shadow: 0 -12px 48px rgba(0,0,0,0.8), 0 0 30px var(--primary-glow);
+}
+.wallet-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.wallet-modal-title { font-size: 18px; color: var(--text-primary); font-family: 'Orbitron', sans-serif; }
+.close-modal-btn {
+background: var(--bg-card); border: none; width: 36px; height: 36px; border-radius: 50%;
+display: flex; align-items: center; justify-content: center; color: var(--text-dim); cursor: pointer; transition: var(--transition-fast);
+transform: translateY(0); box-shadow: 0 4px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.close-modal-btn:hover { color: var(--primary); background: rgba(0, 243, 255, 0.12); }
+.close-modal-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
+
+.wallet-history-list { display: flex; flex-direction: column; gap: 12px; }
+.tx-row {
+background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md);
+padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; transition: var(--transition-fast);
+box-shadow: 0 4px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.tx-row:hover { border-color: var(--border-hover); transform: translateX(2px); }
+.tx-info { display: flex; align-items: center; gap: 14px; }
+.tx-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.tx-icon.sent { background: rgba(255, 0, 60, 0.18); color: var(--danger); }
+.tx-icon.received { background: rgba(10, 255, 104, 0.18); color: var(--success); }
+.tx-icon.pending { background: rgba(255, 238, 0, 0.18); color: var(--warning); }
+.tx-details h4 { font-size: 14px; color: var(--text-primary); margin-bottom: 2px; }
+.tx-details p { font-size: 11px; color: var(--text-dim); }
+.tx-amount { font-size: 15px; font-family: 'Orbitron', sans-serif; text-align: right; }
+.tx-amount.sent { color: var(--danger); }
+.tx-amount.received { color: var(--success); }
+.tx-status { font-size: 10px; margin-top: 6px; padding: 3px 10px; border-radius: 99px; display: inline-block; }
+.tx-status.pending { background: rgba(255, 238, 0, 0.18); color: var(--warning); }
+.tx-status.approved { background: rgba(10, 255, 104, 0.18); color: var(--success); }
+.info-btn {
+width: 32px; height: 32px; border-radius: 50%; background: rgba(0, 243, 255, 0.18); border: 1px solid var(--primary);
+color: var(--primary); display: flex; align-items: center; justify-content: center;
+font-family: 'Rajdhani', sans-serif; font-size: 14px; cursor: pointer; transition: var(--transition-fast);
+transform: translateY(0); box-shadow: 0 4px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.info-btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 16px var(--primary-glow); }
+.info-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
+
+/* SWAP */
+.swap-container {
+background: var(--bg-card); backdrop-filter: var(--glass); border: 1px solid var(--border);
+border-radius: var(--radius-md); padding: 24px;
+box-shadow: 0 8px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.swap-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.swap-icon { font-size: 28px; animation: swapRotate 3s linear infinite; }
+@keyframes swapRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.swap-balance { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.swap-rate-info { font-size: 11px; color: var(--text-dim); background: rgba(188, 89, 254, 0.18); padding: 8px 14px; border-radius: var(--radius-full); text-align: center; margin-bottom: 16px; }
+.swap-input-row { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+.swap-input-row input { flex: 1; }
+.max-btn {
+background: var(--accent); color: #000; border: none; padding: 8px 16px; border-radius: var(--radius-full);
+font-family: 'Rajdhani', sans-serif; font-size: 12px; cursor: pointer; transition: var(--transition-fast);
+transform: translateY(0); box-shadow: 0 4px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.max-btn:hover { box-shadow: 0 0 18px var(--accent-glow); transform: scale(1.05); }
+.max-btn:active { transform: translateY(2px) scale(0.98); box-shadow: 0 2px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2); }
+
+.swap-result { background: rgba(0, 243, 255, 0.08); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin: 16px 0; text-align: center; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+.swap-result-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; }
+.swap-result-value { font-size: 22px; color: var(--secondary); margin-top: 4px; }
+/* NFT STAKING */
+.nft-container {
+background: var(--bg-card); backdrop-filter: var(--glass); border: 1px solid var(--border);
+border-radius: var(--radius-lg); padding: 24px; position: relative; overflow: hidden;
+box-shadow: 0 8px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.nft-container::before {
+content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+background: linear-gradient(90deg, var(--accent), var(--secondary), var(--primary), var(--success));
+animation: gradientFlow 4s linear infinite;
+}
+@keyframes gradientFlow { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+.nft-header { text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.nft-title {
+font-family: 'Orbitron', sans-serif; font-size: 20px;
+background: linear-gradient(135deg, var(--accent), var(--secondary));
+-webkit-background-clip: text; -webkit-text-fill-color: transparent;
+margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.nft-subtitle { font-size: 12px; color: var(--text-dim); }
+.nft-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin: 20px 0; }
+.nft-card {
+background: var(--bg-surface-solid); border: 2px solid var(--border);
+border-radius: var(--radius-md); padding: 20px; position: relative;
+transition: var(--transition-normal); overflow: hidden;
+transform: translateY(0); box-shadow: 0 6px 0 rgba(0,0,0,0.4), 0 12px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.nft-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0, 243, 255, 0.3), 0 6px 0 rgba(0,0,0,0.3); }
+.nft-card.staked { border-color: var(--success); box-shadow: 0 0 24px var(--success-glow), 0 6px 0 rgba(0,0,0,0.4); }
+.nft-card-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+.nft-image {
+width: 80px; height: 80px; border-radius: var(--radius-sm); object-fit: cover;
+border: 3px solid var(--primary); box-shadow: 0 0 20px var(--primary-glow);
+animation: nftFloat 3.5s ease-in-out infinite;
+}
+.nft-card.staked .nft-image { border-color: var(--success); box-shadow: 0 0 20px var(--success-glow); }
+.nft-info { flex: 1; }
+.nft-name { font-family: 'Orbitron', sans-serif; font-size: 16px; color: var(--text-primary); margin-bottom: 4px; }
+.nft-rarity {
+font-size: 10px; text-transform: uppercase; padding: 3px 10px; border-radius: var(--radius-full); display: inline-block; margin-bottom: 6px;
+}
+.rarity-common { background: rgba(155, 155, 155, 0.2); color: #999; }
+.rarity-uncommon { background: rgba(10, 255, 104, 0.2); color: var(--success); }
+.rarity-rare { background: rgba(188, 89, 254, 0.2); color: var(--secondary); }
+.rarity-epic { background: rgba(255, 238, 0, 0.2); color: var(--warning); }
+.rarity-legendary { background: rgba(255, 0, 60, 0.2); color: var(--danger); }
+.nft-description { font-size: 11px; color: var(--text-dim); line-height: 1.5; margin-bottom: 12px; }
+.nft-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+.nft-stat { background: rgba(255,255,255,0.04); padding: 8px; border-radius: var(--radius-sm); text-align: center; }
+.nft-stat-label { font-size: 9px; color: var(--text-dim); text-transform: uppercase; }
+.nft-stat-value { font-size: 13px; color: var(--primary); margin-top: 2px; }
+.nft-actions { display: flex; gap: 8px; }
+.stake-btn, .unstake-btn {
+flex: 1; padding: 12px; border-radius: var(--radius-full); font-family: 'Rajdhani', sans-serif; font-size: 11px;
+cursor: pointer; transition: var(--transition-fast); text-transform: uppercase; letter-spacing: 0.5px; border: none;
+transform: translateY(0); box-shadow: 0 4px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.stake-btn {
+background: linear-gradient(135deg, rgba(0, 243, 255, 0.2), rgba(188, 19, 254, 0.2));
+border: 1px solid var(--primary); color: var(--primary);
+}
+.stake-btn:hover:not(:disabled) { background: var(--primary); color: #000; box-shadow: 0 0 22px var(--primary-glow); }
+.stake-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: translateY(0); box-shadow: none; }
+.unstake-btn {
+background: linear-gradient(135deg, rgba(10, 255, 104, 0.2), rgba(0, 243, 255, 0.2));
+border: 1px solid var(--success); color: var(--success);
+}
+.unstake-btn:hover:not(:disabled) { background: var(--success); color: #000; box-shadow: 0 0 22px var(--success-glow); }
+.unstake-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: translateY(0); box-shadow: none; }
+.stake-btn:active, .unstake-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
+
+.staking-timer {
+background: rgba(188, 89, 254, 0.12); border: 1px solid rgba(188, 89, 254, 0.35);
+border-radius: var(--radius-sm); padding: 12px; margin-top: 12px; text-align: center;
+box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.timer-label-small { font-size: 10px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; }
+.timer-value-small { font-family: 'Orbitron', sans-serif; font-size: 16px; color: var(--secondary); letter-spacing: 1px; }
+.nft-badge {
+position: absolute; top: 12px; right: 12px; background: var(--success); color: #000; font-size: 9px;
+padding: 4px 10px; border-radius: var(--radius-full); text-transform: uppercase;
+}
+.staking-info {
+background: rgba(0, 243, 255, 0.08); border: 1px solid var(--border);
+border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;
+box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.staking-info-title {
+font-size: 12px; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+}
+.staking-info-text { font-size: 11px; color: var(--text-dim); line-height: 1.6; }
+.total-staked {
+background: linear-gradient(135deg, rgba(0, 243, 255, 0.15), rgba(188, 89, 254, 0.15));
+border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px; text-align: center;
+box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.total-staked-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px; }
+.total-staked-value { font-size: 24px; color: var(--primary); text-shadow: 0 0 20px var(--primary-glow); }
+/* PRESALE */
+input[type="range"].presale-slider {
+-webkit-appearance: none; appearance: none; width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; outline: none; cursor: pointer; margin: 20px 0 12px;
+}
+input[type="range"].presale-slider::-webkit-slider-thumb {
+-webkit-appearance: none; appearance: none; width: 24px; height: 24px; background: var(--accent); border-radius: 50%; cursor: pointer; box-shadow: 0 0 14px var(--accent-glow); transition: transform 0.2s ease; border: 2px solid #000;
+}
+input[type="range"].presale-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+input[type="range"].presale-slider::-moz-range-thumb {
+width: 24px; height: 24px; background: var(--accent); border-radius: 50%; cursor: pointer; border: 2px solid #000; box-shadow: 0 0 14px var(--accent-glow);
+}
+.presale-info-box {
+background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: var(--radius-sm);
+padding: 14px; text-align: center; transition: var(--transition-fast);
+box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.presale-info-box:hover { border-color: var(--primary); transform: translateY(-2px); }
+/* FINAL CLAIM */
+.final-claim-wrapper { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.final-claim-wrapper .cyber-btn { flex: 1; background: linear-gradient(135deg, rgba(255, 238, 0, 0.2), rgba(255, 0, 60, 0.15)); border-color: var(--accent); color: var(--accent); }
+.final-claim-wrapper .cyber-btn:hover:not(:disabled) { background: var(--accent); color: #000; }
+.final-claim-wrapper .cyber-btn:disabled { border-color: var(--text-dim); color: var(--text-dim); background: rgba(255,255,255,0.04); transform: translateY(0); box-shadow: none; }
+/* VIEW TRANSITION */
+#viewTransitionOverlay {
+position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(5, 10, 20, 0.95); backdrop-filter: blur(20px); z-index: 5000;
+display: none; align-items: center; justify-content: center; flex-direction: column; gap: 20px; animation: fadeIn 200ms ease;
+}
+#viewTransitionOverlay.active { display: flex; }
+.transition-loader {
+width: 50px; height: 50px; border: 4px solid rgba(0, 243, 255, 0.3);
+border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+.transition-text { font-family: 'Rajdhani', sans-serif; color: var(--text-secondary); font-size: 14px; }
+/* ANIMATION ENHANCEMENTS */
+@keyframes moduleGlow { 0%, 100% { box-shadow: 0 0 10px var(--primary-glow); } 50% { box-shadow: 0 0 25px var(--primary-glow), 0 0 40px var(--accent-glow); } }
+.defense-slot.active .defense-slot-icon { animation: moduleFloat 3s ease-in-out infinite, moduleGlow 2s ease-in-out infinite; }
+.module-icon { animation: modulePulse 2.5s ease-in-out infinite, moduleGlow 2s ease-in-out infinite; }
+/* MEDIA QUERIES */
+@media (max-width: 360px) {
+.app-container { padding-left: 16px; padding-right: 16px; }
+.stat-value { font-size: 28px; }
+.wallet-balance-amount { font-size: 36px; }
+.hud-dock { height: 68px; width: 98%; }
+.hud-item span { font-size: 8px; }
+.nft-stats { grid-template-columns: 1fr; }
+}
+@supports (padding: max(0px)) {
+.app-container {
+padding-left: max(20px, env(safe-area-inset-left));
+padding-right: max(20px, env(safe-area-inset-right));
+}
+}
+/* HOLD LMB ANIMATION */
+.held-balance-animate { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease; }
+.held-balance-animate.success { transform: scale(1.15); filter: drop-shadow(0 0 18px var(--success-glow)); }
+@keyframes nftFloat {
+0%, 100% { transform: translateY(0) scale(1); filter: brightness(1); }
+50% { transform: translateY(-5px) scale(1.03); filter: brightness(1.1); box-shadow: 0 10px 30px var(--primary-glow); }
+}
+/* MINT BLOCK GAME STYLES */
+.mint-game-container { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; position: relative; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05); }
+.mint-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 16px 0; }
+.block-cell {
+aspect-ratio: 1; background: var(--bg-surface-solid); border: 1px solid var(--border);
+border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;
+cursor: pointer; transition: all 0.2s ease; position: relative;
+transform: translateY(0); box-shadow: 0 3px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.block-cell.selected { border-color: var(--secondary); background: rgba(188, 19, 254, 0.15); box-shadow: 0 0 12px var(--secondary-glow); transform: scale(0.95); }
+.block-cell.matched { border-color: var(--success); background: rgba(10, 255, 104, 0.15); box-shadow: 0 0 16px var(--success-glow); animation: pulseMatch 0.5s ease infinite alternate; }
+.block-cell.empty { background: rgba(255,255,255,0.02); border-style: dashed; pointer-events: none; box-shadow: none; }
+@keyframes pulseMatch { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
+.scanner-overlay {
+position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+background: linear-gradient(to bottom, transparent, rgba(0, 243, 255, 0.1), transparent);
+transform: translateY(-100%); animation: scanMove 2s linear infinite; pointer-events: none; z-index: 5;
+}
+@keyframes scanMove { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
+.mint-actions { display: flex; gap: 12px; margin-top: 16px; }
+.mint-btn-action { flex: 1; background: linear-gradient(135deg, rgba(0, 243, 255, 0.2), rgba(188, 19, 254, 0.2)); border: 1px solid var(--primary); color: var(--primary); }
+.gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-height: 60vh; overflow-y: auto; padding: 4px; }
+.gallery-item { background: var(--bg-surface-solid); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05); }
+.gallery-icon { width: 48px; height: 48px; margin: 0 auto 8px; }
+.gallery-icon svg { width: 100%; height: 100%; }
+.gallery-name { font-size: 12px; color: var(--text-primary); }
+.gallery-rarity { font-size: 10px; color: var(--text-dim); margin-top: 4px; }
+</style>
+</head>
+<body>
+<div id="bg-animation"></div>
+<div class="scanlines"></div>
+<div class="glow-overlay"></div>
+<div id="particles"></div>
+<!-- VIEW TRANSITION OVERLAY -->
+<div id="viewTransitionOverlay">
+<div class="transition-loader"></div>
+<div class="transition-text" id="transitionText">Loading...</div>
+</div>
+<div id="referral-welcome">
+<div class="welcome-card">
+<div class="welcome-title">WELCOME TO LUMEN BEAM</div>
+<div class="text-dim" style="margin-bottom: 20px;">You've been invited to defend the protocol</div>
+<div class="referrer-info">
+<div class="stat-label text-center" style="margin-bottom:12px;">YOUR INVITER</div>
+<div class="flex-center" style="gap:14px; flex-direction: column;">
+<img id="referrerAvatar" src="" class="referrer-avatar" alt="Inviter" />
+<div>
+<div class="referrer-name" id="referrerName">Loading...</div>
+<div style="font-size:12px; color: var(--text-dim);" id="referrerId">ID: ...</div>
+</div>
+</div>
+</div>
+<div class="text-accent" id="welcomeCountdown" style="font-family:'Orbitron';">Initializing in 3s...</div>
+</div>
+</div>
+<div id="loader">
+<div class="loader-spinner"></div>
+<div class="brand-logo">
+<img src="https://i.postimg.cc/yYNkX4jY/60390811.webp" alt="Lumen Beam Logo">
+</div>
+<div id="loaderText">Initializing protocol...</div>
+</div>
+<div class="app-container">
+<header class="hud-header">
+<button class="mint-btn" onclick="openMintGame()">MINT BLOCK</button>
+<div style="display:flex; align-items:center; gap:12px;">
+<button id="themeToggleBtn" class="cyber-btn secondary" style="width:auto; padding:4px 10px; font-size:9px;" onclick="toggleTheme()">🌙 DARK</button>
+<div class="connection-status">
+<span class="status-dot"></span>
+<span>ONLINE</span>
+</div>
+</div>
+</header>
+<!-- VIEW: HQ (Main Game) -->
+<div id="view-hq" class="view-section active">
+<div class="cyber-card" style="padding:0; border:none; background:transparent; overflow:hidden;">
+<div class="game-canvas-container" style="position: relative; width: 100%; height: 220px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: var(--radius-md); margin-bottom: 16px; overflow: hidden;">
+<canvas id="gameCanvas"></canvas>
+<div style="position:absolute; bottom:10px; left:10px; font-size:10px; color:var(--primary); font-family:'Orbitron'; background:rgba(0,0,0,0.6); padding:4px 8px; border-radius:4px;">
+DEFENSE INTEGRITY: <span id="defenseIntegrity">100%</span>
+</div>
+</div>
+</div>
+<div class="cyber-card" style="text-align: center; position: relative;">
+<div class="stat-label">LUMEN CREDITS (LMB)</div>
+<div class="stat-value" id="displayBalance">0.000</div>
+<div style="font-size:10px; color:var(--text-dim); margin-top:4px;">GENERATION RATE: <span id="totalMiningRate" style="color:var(--success);">0.0</span> GH/s</div>
+</div>
+<div class="defense-grid-wrapper">
+<div class="grid-header">
+<span class="grid-title">Defense Grid</span>
+<span class="total-mining-rate" id="gridMiningRate">0.0 GH/s</span>
+</div>
+<div class="defense-grid" id="defenseGrid"></div>
+</div>
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:12px;">
+<div class="cyber-card">
+<div class="stat-label">Bloom Streak</div>
+<div class="stat-value" style="font-size:20px; color:var(--text-primary);" id="displayStreak">0 <span style="font-size:11px;">DAYS</span></div>
+</div>
+<div class="cyber-card">
+<div class="stat-label">TON Balance</div>
+<div class="stat-value" style="font-size:20px; color:var(--text-primary);" id="displayTon">0.00 TON</div>
+</div>
+</div>
+<!-- FINAL CLAIM BUTTON -->
+<div class="final-claim-wrapper" style="margin-top: 16px;">
+<button class="cyber-btn" id="btnFinalClaim" onclick="executeFinalClaim()" disabled>SYSTEM SYNC</button>
+<div class="info-btn" onclick="openFinalClaimInfo()"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>
+</div>
+<button class="cyber-btn secondary" style="margin-top: 8px;" id="btnDailySpin" onclick="openSpinWheel()">DAILY PROTOCOL SPIN</button>
+</div>
+<!-- VIEW: MISSIONS -->
+<div id="view-missions" class="view-section">
+<h2 class="card-title" style="margin-bottom:20px;">Active Protocols</h2>
+<div class="task-card" onclick="openModuleStore()">
+<div class="task-content">
+<div class="task-title">Module Workshop</div>
+<div class="task-desc">Upgrade your defense grid with advanced modules</div>
+</div>
+<div class="task-action">EXPLORE</div>
+</div>
+<div class="ad-section-big" style="margin-top: 20px;">
+<div class="card-header">
+<span class="card-title" style="color:var(--secondary);">Energy Recharge</span>
+<span style="font-size:12px; color:var(--success);">+1 LMB/watch</span>
+</div>
+<p style="font-size:13px; color:var(--text-dim); margin-bottom:18px;">Watch data streams to recharge shield generators and earn credits.</p>
+<div class="stats-row">
+<div class="stat-box"><div class="stat-box-label">TODAY</div><div class="stat-box-value" id="adStatToday">0</div></div>
+<div class="stat-box"><div class="stat-box-label">YESTERDAY</div><div class="stat-box-value" id="adStatYesterday">0</div></div>
+<div class="stat-box"><div class="stat-box-label">WEEK</div><div class="stat-box-value" id="adStatWeek">0</div></div>
+<div class="stat-box"><div class="stat-box-label">MONTH</div><div class="stat-box-value" id="adStatMonth">0</div></div>
+</div>
+<button class="cyber-btn secondary" id="btnWatchAd" type="button" style="margin-bottom: 18px;" onclick="watchAd()">INITIATE RECHARGE</button>
+</div>
+<div class="task-tabs" style="margin-top: 20px;">
+<button class="task-tab active" id="tabAvailable" onclick="switchTaskTab('available')">Available Quests</button>
+<button class="task-tab" id="tabCompleted" onclick="switchTaskTab('completed')">Completed</button>
+</div>
+<div id="tasksContainer" style="margin-top: 0;"></div>
+<!-- AVATAR UNLOCK SECTION -->
+<div class="cyber-card" style="margin-top: 20px; border-color: var(--warning);">
+<div class="card-header">
+<span class="card-title" style="color: var(--warning);">Unlock Ranking Avatar</span>
+</div>
+<p style="font-size: 13px; color: var(--text-dim); margin-bottom: 12px;">Pay 1 TON to permanently unlock your Telegram avatar on the Global Leaderboard.</p>
+<button class="cyber-btn" id="btnUnlockAvatar" onclick="unlockRankingAvatar()" style="background: rgba(255, 238, 0, 0.15); border-color: var(--warning); color: var(--warning);">UNLOCK FOR 1 TON</button>
+<div id="avatarStatus" style="font-size: 11px; margin-top: 8px; color: var(--success); display: none;">✅ Avatar Unlocked! It will now appear in rankings.</div>
+</div>
+</div>
+<!-- VIEW: WORKSHOP (Module Store) -->
+<div id="view-workshop" class="view-section">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+<button class="back-btn" onclick="switchView('missions')">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+Back to Missions
+</button>
+<div class="info-btn" onclick="openModuleInfo()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>
+</div>
+<div class="module-store-header">
+<div>
+<div class="module-balance-label">TON Balance</div>
+<div class="module-balance-value" id="moduleTonBalance">0.00000 TON</div>
+</div>
+<div style="text-align:right;">
+<div class="module-balance-label">Total Mining</div>
+<div class="module-speed" id="currentMiningSpeed" style="color:var(--success);">0.0 GH/s</div>
+</div>
+</div>
+<div class="module-section-title">My Modules</div>
+<div class="owned-modules-grid" id="ownedModulesList"></div>
+<div class="module-section-title">Module Store</div>
+<div id="moduleStoreList"></div>
+</div>
+<!-- VIEW: NFT STAKING -->
+<div id="view-nft" class="view-section">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+<button class="back-btn" onclick="switchView('vault')">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+Back to Vault
+</button>
+<div class="info-btn" onclick="notify('Stake NFTs for 30 days to earn 25% APY rewards!')"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>
+</div>
+<div class="nft-container">
+<div class="nft-header">
+<div class="nft-title"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> NFT STAKING</div>
+<div class="nft-subtitle">Stake rare NFTs • Earn 25% APY • 30-day terms</div>
+</div>
+<div class="total-staked">
+<div class="total-staked-label">Total Staked Value</div>
+<div class="total-staked-value" id="totalStakedValue">0.00 TON</div>
+</div>
+<div class="staking-info">
+<div class="staking-info-title"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> How Staking Works</div>
+<div class="staking-info-text">• Stake your NFT for 30 days<br>• Earn 25% APY on staked value<br>• Rewards auto-added to balance after unstaking<br>• Cannot unstake before 30 days</div>
+</div>
+<div class="nft-grid" id="nftGrid"></div>
+</div>
+</div>
+<!-- VIEW: SWAP -->
+<div id="view-swap" class="view-section">
+<button class="back-btn" onclick="switchView('vault')">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+Back to Vault
+</button>
+<div class="swap-container">
+<div class="swap-header">
+<span class="swap-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 12l-4-4 4-4m10 4v12m0-12l4 4-4 4"/></svg></span>
+<h2 class="card-title">Swap LMB to TON</h2>
+</div>
+<div class="swap-balance">
+<span style="font-size:12px; color:var(--text-dim);">Your LMB Balance</span>
+<span style="font-size:16px; color:var(--primary);" id="swapLmbBalance">0.000 LMB</span>
+</div>
+<div class="swap-rate-info">Rate: 1 LMB = 0.0000005 TON</div>
+<div class="swap-input-row">
+<input type="number" class="cyber-input" id="swapInput" placeholder="Amount of LMB" step="0.001" min="0" oninput="calculateSwap()">
+<button class="max-btn" onclick="setMaxSwap()">MAX</button>
+</div>
+<div class="swap-result">
+<div class="swap-result-label">You will receive</div>
+<div class="swap-result-value" id="swapResult">0.000000 TON</div>
+</div>
+<button class="cyber-btn" id="btnConfirmSwap" onclick="confirmSwap()" disabled>CONFIRM SWAP</button>
+</div>
+<div class="cyber-card" style="margin-top: 16px; text-align:center;">
+<div class="stat-label" style="margin-bottom:12px;">Token Breakdown</div>
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+<div style="background:rgba(10,204,113,0.1); border:1px solid var(--success); border-radius:var(--radius-sm); padding:12px;">
+<div style="font-size:10px; color:var(--text-dim); text-transform:uppercase;">Earned (Swappable)</div>
+<div style="font-size:16px; color:var(--success);" id="swapEarnedDisplay">0.000</div>
+</div>
+<div style="background:rgba(188,89,254,0.1); border:1px solid var(--secondary); border-radius:var(--radius-sm); padding:12px;">
+<div style="font-size:10px; color:var(--text-dim); text-transform:uppercase;">Presale (Locked)</div>
+<div style="font-size:16px; color:var(--secondary);" id="swapPresaleDisplay">0.000</div>
+</div>
+</div>
+</div>
+</div>
+<!-- VIEW: MINT BLOCK GAME -->
+<div id="view-mintgame" class="view-section">
+<button class="back-btn" onclick="switchView('hq')">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+Back to Base
+</button>
+<div class="mint-game-container">
+<div class="card-header">
+<span class="card-title" style="color: var(--primary);">MINT BLOCK</span>
+<button class="cyber-btn secondary" style="width:auto; padding:6px 12px; font-size:10px;" onclick="switchView('blocks')">VIEW BLOCKS</button>
+</div>
+<p style="font-size:13px; color:var(--text-dim); margin-bottom:12px;">Find 4 matching blocks using the scanner. Tap to select.</p>
+<div style="position:relative;">
+<div class="scanner-overlay"></div>
+<div class="mint-grid" id="mintGrid"></div>
+</div>
+<div class="mint-actions">
+<button class="cyber-btn mint-btn-action" id="btnMintBlock" onclick="executeMint()" disabled>MINT BLOCK</button>
+<button class="cyber-btn secondary" onclick="resetMintGrid()" style="width:auto;">RESET</button>
+</div>
+<div style="font-size:11px; color:var(--text-dim); margin-top:12px; text-align:center;">Reward: <span style="color:var(--success);">+1 LMB</span> per successful mint.</div>
+</div>
+</div>
+<!-- VIEW: BLOCKS GALLERY -->
+<div id="view-blocks" class="view-section">
+<button class="back-btn" onclick="switchView('mintgame')">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+Back to Mint Game
+</button>
+<h2 class="card-title" style="margin-bottom:16px;">Block Registry</h2>
+<div class="gallery-grid" id="blocksGallery"></div>
+</div>
+<!-- VIEW: NETWORK (Referrals) -->
+<div id="view-network" class="view-section">
+<h2 class="card-title" style="margin-bottom:20px;">Neural Network</h2>
+<div class="cyber-card" style="text-align:center;">
+<div class="stat-label">INVITE CODE</div>
+<div class="stat-value" style="font-size:13px; margin:12px 0; word-break:break-all; color:var(--primary);" id="referralLinkDisplay">LOADING...</div>
+<button class="cyber-btn secondary" id="btnCopyLink" onclick="copyReferralLink()">COPY ACCESS CODE</button>
+<div style="display:flex; gap:12px; justify-content:center; margin-top:16px;">
+<button class="cyber-btn" onclick="shareToX()" style="width:auto; padding:10px 20px; background:#000; color:#fff; border-color:#333;">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> Share on X
+</button>
+<button class="cyber-btn" onclick="shareToTelegram()" style="width:auto; padding:10px 20px; background:#0088cc; color:#fff; border-color:#0077b3;">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.361 8.627-.168.9-.5 1.201-.82 1.23-.697.064-1.225-.461-1.901-.903-1.056-.693-1.653-1.124-2.678-1.799-1.185-.78-.417-1.205.258-1.905.177-.184 3.247-2.977 3.307-3.23.007-.032.015-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.491-1.302.481-.428-.011-1.252-.242-1.865-.442-.751-.244-1.346-.374-1.297-.789.027-.216.324-.437.893-.663 3.498-1.524 5.831-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.477-1.635.099-.002.321.023.465.142.121.1.155.236.17.331.015.096.034.314.018.487z"/></svg> Share on Telegram
+</button>
+</div>
+</div>
+<div class="cyber-card" style="margin-top: 18px;">
+<div class="card-header">
+<span class="card-title" style="font-size:12px;">OPERATIVE TIER</span>
+<span id="tierCommission" class="tier-commission">5%</span>
+</div>
+<div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+<div style="font-size:12px; color:var(--text-dim);">Progress to next tier:</div>
+</div>
+<div class="tier-progress" style="flex:1; height: 6px; background: rgba(255,255,255,0.12); border-radius: var(--radius-full); overflow: hidden;">
+<div class="tier-fill" id="tierProgress" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: width 0.3s ease; border-radius: var(--radius-full);"></div>
+</div>
+<div style="font-size:10px; color:var(--text-dim); text-align:center; margin-top:6px;" id="tierProgressText">0/25 operatives</div>
+</div>
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin:20px 0;">
+<div class="cyber-card text-center">
+<div class="stat-value" style="color:var(--text-primary);" id="refCount">0</div>
+<div class="stat-label">OPERATIVES</div>
+</div>
+<div class="cyber-card text-center">
+<div class="stat-value" style="color:var(--text-primary);" id="refEarnings">0</div>
+<div class="stat-label">COMMISSION</div>
+</div>
+</div>
+<h3 class="card-title" style="font-size:14px; margin-bottom:10px; opacity:0.7;">ACTIVE OPERATIVES</h3>
+<div id="referralList"></div>
+</div>
+<!-- VIEW: VAULT -->
+<div id="view-vault" class="view-section">
+<h2 class="card-title" style="margin-bottom:20px;">Secure Vault</h2>
+<div id="announcementContainer"></div>
+<div class="wallet-balance-card">
+<div class="wallet-balance-label">LMB Balance</div>
+<div class="wallet-balance-amount" id="walletBalance">0.000</div>
+<div class="wallet-balance-currency">LUMEN CREDITS</div>
+<div style="font-size:12px; color:var(--text-dim); margin-top:10px;">EST. VALUE: <span style="color:var(--accent);" id="usdValue">$0.00</span></div>
+</div>
+<div class="wallet-actions-grid">
+<div class="wallet-action-btn" onclick="showComingSoon('Send')"><div class="wallet-action-icon">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+</div><div class="wallet-action-text">SEND</div></div>
+<div class="wallet-action-btn" onclick="openReceiveModal()"><div class="wallet-action-icon">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+</div><div class="wallet-action-text">RECEIVE</div></div>
+<div class="wallet-action-btn" onclick="showComingSoon('History')"><div class="wallet-action-icon">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-9 9 9.75 9.75 0 01-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+</div><div class="wallet-action-text">HISTORY</div></div>
+<div class="wallet-action-btn" onclick="openSwapView()"><div class="wallet-action-icon">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 12l-4-4 4-4m10 4v12m0-12l4 4-4 4"/></svg>
+</div><div class="wallet-action-text">SWAP</div></div>
+<div class="wallet-action-btn" onclick="openHoldView()"><div class="wallet-action-icon">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 6v6l4 2"/></svg>
+</div><div class="wallet-action-text">HOLD LMB</div></div>
+<div class="wallet-action-btn" onclick="switchView('presale')"><div class="wallet-action-icon">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+</div><div class="wallet-action-text">PRESALE</div></div>
+</div>
+<div class="ton-wallet-section" style="background: rgba(188, 89, 254, 0.1); border: 1px solid rgba(188, 89, 254, 0.35); border-radius: var(--radius-md); padding: 20px; margin: 20px 0;">
+<div class="ton-wallet-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+<div class="ton-wallet-title" style="display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-primary); font-family: 'Rajdhani', sans-serif;">
+<img src="https://i.postimg.cc/Vs2Tm71N/15208522.png" style="width:24px; height:24px; object-fit:contain; margin-right:4px;">
+<span>TON Wallet</span>
+</div>
+<div class="ton-wallet-balance" id="tonBalanceDisplay" style="font-size: 18px; color: var(--secondary); font-family: 'Orbitron', sans-serif;">0.00000 TON</div>
+</div>
+<div id="tonWalletInfo" style="margin-top:18px;">
+<div style="background:rgba(0,0,0,0.3); padding:14px; border-radius:var(--radius-sm); margin-bottom:14px; word-break:break-all; font-family:monospace; font-size:11px; border:1px solid var(--border); color: var(--text-secondary);" id="tonAddressDisplay">Not connected</div>
+<div class="wallet-actions-grid" style="margin: 14px 0;">
+<div class="wallet-action-btn" onclick="openTonSendModal()"><div class="wallet-action-icon">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+</div><div class="wallet-action-text">WITHDRAW</div></div>
+<div class="wallet-action-btn" onclick="openReceiveModal()"><div class="wallet-action-icon">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+</div><div class="wallet-action-text">RECEIVE</div></div>
+<div class="wallet-action-btn" onclick="openBCDepositModal()"><div class="wallet-action-icon">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/><path d="M12 8v8m-4-4h8"/></svg>
+</div><div class="wallet-action-text">AUTO DEPOSIT</div></div>
+<div class="wallet-action-btn" onclick="openTonHistoryModal()"><div class="wallet-action-icon">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-9 9 9.75 9.75 0 01-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+</div><div class="wallet-action-text">HISTORY</div></div>
+</div>
+<div id="tonDetailsExpand" style="display:none; border-top: 1px solid rgba(255,255,255,0.1); padding-top:18px; margin-top:14px;">
+<div class="text-center" style="margin-bottom:14px;">
+<div class="ton-qr-container" style="background: white; padding: 16px; border-radius: var(--radius-md); display: inline-block; box-shadow: 0 10px 42px rgba(0, 0, 0, 0.32);">
+<img id="depositQrCode" src="" style="width:140px; height:140px;">
+</div>
+<div style="font-size:10px; color:var(--text-dim);">FOREST DEPOSIT ADDRESS</div>
+<div style="font-family:monospace; font-size:10px; color:var(--primary); margin-top:6px; word-break:break-all; padding: 10px; background: rgba(0,0,0,0.25); border-radius: var(--radius-sm);" id="depositAddressBox">UQCstqbGYnWNiGYDJVxNSn1qhwMsgecJYIco-G3vTg9ArqY2</div>
+<button class="copy-btn" style="margin-top: 10px;" onclick="copyDepositAddress()">COPY ADDRESS</button>
+<div style="margin-top:16px; font-size:10px; color:var(--text-dim);">MEMO / COMMENT</div>
+<div style="font-family:monospace; font-size:10px; color:var(--secondary); margin-top:6px; word-break:break-all; padding: 10px; background: rgba(188,89,254,0.12); border-radius: var(--radius-sm); border:1px solid var(--border);" id="tonDepositMemo">LUMEN<span id="memoUserId">...</span></div>
+<button class="copy-btn" style="margin-top: 10px; background:rgba(188,89,254,0.18); border-color:var(--secondary); color:var(--secondary);" onclick="copyTonDepositMemo()">COPY MEMO</button>
+</div>
+</div>
+</div>
+<div id="tonWalletActions" style="display:flex; gap:10px; margin-top:12px;">
+<button class="cyber-btn" id="btnConnectTon" style="background:rgba(188, 89, 254, 0.18); border-color:var(--secondary); color:var(--secondary);" onclick="connectTon()">CONNECT TON WALLET</button>
+<button class="cyber-btn secondary" id="btnDisconnectTon" style="display:none; flex:1;" onclick="disconnectTon()">DISCONNECT</button>
+</div>
+</div>
+<h3 class="card-title" style="font-size:14px; margin:24px 0 12px;">GLOBAL MARKET</h3>
+<div class="cyber-card" id="marketList"></div>
+</div>
+<!-- VIEW: HOLD LMB -->
+<div id="view-holdlmb" class="view-section">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+<button class="back-btn" onclick="switchView('vault')">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+Back to Vault
+</button>
+<div class="info-btn" onclick="notify('Holding LMB secures your tokens for future ecosystem benefits. Estimated value reflects projected listing price.')">
+<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+</div>
+</div>
+<div class="cyber-card" style="text-align:center; margin-bottom:20px;">
+<h2 class="card-title" style="justify-content:center; display:flex; align-items:center; gap:8px;">
+<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+$LMB HOLD PROGRAM
+</h2>
+<p style="font-size:12px; color:var(--text-dim); line-height:1.5; margin:12px 0;">
+Secure your $LMB tokens for future ecosystem benefits. Held tokens will retain their estimated value and unlock exclusive rewards upon official listing.
+</p>
+<div style="background:rgba(0,243,255,0.1); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; margin:10px 0;">
+<div style="font-size:10px; color:var(--text-dim); text-transform:uppercase;">Your Available LMB</div>
+<div style="font-size:20px; color:var(--primary);" id="holdAvailableBalance">0.000</div>
+</div>
+</div>
+<div class="cyber-card" style="margin-bottom:16px;">
+<div class="card-header">
+<span class="card-title" style="display:flex; align-items:center; gap:8px;">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 6v6l4 2"/></svg>
+HOLD LMB
+</span>
+</div>
+<div class="swap-input-row">
+<input type="number" class="cyber-input" id="holdAmountInput" placeholder="Amount to Hold" step="0.001" min="0" oninput="calculateHold()">
+<button class="max-btn" onclick="setMaxHold()">MAX</button>
+</div>
+<button class="cyber-btn" id="btnExecuteHold" onclick="executeHold()" disabled>HOLD TOKENS</button>
+</div>
+<div class="cyber-card" style="margin-bottom:16px; text-align:center;">
+<div style="font-size:10px; color:var(--text-dim); text-transform:uppercase; margin-bottom:6px;">SECURED HOLD BALANCE</div>
+<div class="stat-value held-balance-animate" id="displayHeldBalance" style="font-size:24px;">0.000</div>
+<div style="font-size:11px; color:var(--text-dim); margin-top:8px;">EST. VALUE: <span id="holdEstimatedValue" style="color:var(--success);">$0.00</span></div>
+</div>
+<div class="cyber-card" style="margin-bottom:16px;">
+<div class="card-header">
+<span class="card-title" style="display:flex; align-items:center; gap:8px;">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-9 9 9.75 9.75 0 01-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+UNHOLD LMB
+</span>
+</div>
+<div class="swap-input-row">
+<input type="number" class="cyber-input" id="unholdAmountInput" placeholder="Amount to Unhold" step="0.001" min="0" oninput="calculateUnhold()">
+<button class="max-btn" onclick="setMaxUnhold()">MAX</button>
+</div>
+<button class="cyber-btn" id="btnExecuteUnhold" onclick="executeUnhold()" disabled style="opacity:0.5; cursor:not-allowed;">UNHOLD TOKENS</button>
+<div style="font-size:10px; color:var(--accent); text-align:center; margin-top:8px;">Unholding will be enabled after official listing.</div>
+</div>
+</div>
+<!-- VIEW: RANKING -->
+<div id="view-ranking" class="view-section">
+<h2 class="card-title" style="margin-bottom:20px;">Global Leaderboard</h2>
+<div class="cyber-card" style="text-align:center; margin-bottom:20px; border-color: var(--secondary);">
+<div class="stat-label">Your Position</div>
+<div class="stat-value" style="color:var(--secondary);" id="myRank">#--</div>
+</div>
+<div id="rankingListContainer" class="ranking-list"></div>
+</div>
+<!-- VIEW: PRESALE -->
+<div id="view-presale" class="view-section">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+<button class="back-btn" onclick="switchView('vault')">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+Back to Vault
+</button>
+<div class="info-btn" onclick="notify('Presale tokens will be distributed to your wallet after successful payment and network confirmation.')">
+<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+</div>
+</div>
+<div class="cyber-card" style="text-align:center; margin-bottom:20px; border-color: var(--accent);">
+<h2 class="card-title" style="justify-content:center; display:flex; align-items:center; gap:10px; color:var(--accent);">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+$LMB PRESALE
+</h2>
+<p style="font-size:13px; color:var(--text-dim); line-height:1.6; margin:12px 0 0;">
+Secure your tokens before public listing. Early participants receive priority allocation, exclusive ecosystem benefits, and maximum value retention upon launch.
+</p>
+<div style="background:rgba(255,238,0,0.1); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px; margin:16px 0 0;">
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; text-align:center;">
+<div class="presale-info-box">
+<div style="font-size:10px; color:var(--text-dim); text-transform:uppercase;">EST. VALUE</div>
+<div style="font-size:16px; color:var(--success);">$0.005</div>
+</div>
+<div class="presale-info-box">
+<div style="font-size:10px; color:var(--text-dim); text-transform:uppercase;">TOKEN PRICE</div>
+<div style="font-size:16px; color:var(--primary);">0.000004 TON</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cyber-card" style="margin-bottom:16px;">
+<div class="card-header">
+<span class="card-title" style="display:flex; align-items:center; gap:8px;">
+<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/></svg>
+Purchase Amount
+</span>
+<span style="font-size:11px; color:var(--accent);">Min: 0.1 TON</span>
+</div>
+<input type="range" id="presaleSlider" class="presale-slider" min="0.1" max="10" step="0.1" value="0.1" oninput="updatePresaleFromSlider()">
+<div style="display:flex; justify-content:space-between; margin-top:4px; font-size:10px; color:var(--text-dim);">
+<span>0.1 TON</span>
+<span>10 TON</span>
+</div>
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:20px 0 16px;">
+<div class="presale-info-box">
+<div style="font-size:10px; color:var(--text-dim);">TON TO PAY</div>
+<div style="font-size:18px; color:var(--primary);" id="presaleTonDisplay">0.100</div>
+</div>
+<div class="presale-info-box">
+<div style="font-size:10px; color:var(--text-dim);">LMB TO RECEIVE</div>
+<div style="font-size:18px; color:var(--success);" id="presaleLmbDisplay">25,000</div>
+</div>
+</div>
+<button class="cyber-btn" id="btnPresaleConfirm" onclick="executePresalePayment()">
+<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+CONFIRM & PAY
+</button>
+</div>
+</div>
+<!-- VIEW: SETTINGS -->
+<div id="view-settings" class="view-section">
+<div style="text-align:center; margin-bottom:24px;">
+<img id="profileAvatar" src="" style="width:84px; height:84px; border-radius:50%; border:3px solid var(--primary); padding:3px; object-fit:cover; box-shadow:0 0 25px var(--primary-glow);">
+<h2 style="font-family:'Orbitron'; margin-top:14px;" id="profileName">OPERATIVE</h2>
+<div style="font-size:12px; color:var(--text-dim); display:flex; align-items:center; justify-content:center; gap:8px;">ID: <span id="profileId">...</span><button class="copy-btn" style="padding:5px 10px; font-size:9px;" onclick="copyProfileId()">COPY</button></div>
+</div>
+<div class="cyber-card" style="margin-bottom: 18px;">
+<div class="card-header"><span class="card-title">PREFERENCES</span></div>
+<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">
+<span style="font-size:13px; color:var(--text-secondary);">Haptic Feedback</span>
+<button id="btnHapticToggle" class="cyber-btn secondary" style="width:auto; padding:6px 12px; font-size:10px;" onclick="toggleHaptic()">ON</button>
+</div>
+<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0;">
+<span style="font-size:13px; color:var(--text-secondary);">Sound Effects</span>
+<button id="btnSoundToggle" class="cyber-btn secondary" style="width:auto; padding:6px 12px; font-size:10px;" onclick="toggleSound()">ON</button>
+</div>
+</div>
+<div class="cyber-card" style="margin-bottom: 18px;">
+<div class="card-header"><span class="card-title">REDEEM CODE</span></div>
+<input type="text" class="cyber-input" id="redeemInput" placeholder="Enter code (e.g., LMB456476)" style="text-transform:uppercase;">
+<button class="cyber-btn" onclick="redeemCodeAction()" style="margin-top:8px;">REDEEM REWARD</button>
+<div id="redeemStatus" style="font-size:11px; color:var(--text-dim); text-align:center; margin-top:8px; min-height:14px;"></div>
+</div>
+</div>
+</div>
+<!-- BOTTOM NAV -->
+<nav class="hud-dock">
+<div class="hud-item active" onclick="switchView('hq')">
+<svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+<span>BASE</span>
+</div>
+<div class="hud-item" onclick="switchView('missions')">
+<svg viewBox="0 0 24 24"><path d="M18 17H6v-2l6-6 6 6v2zm-9-4l-3 3h12l-3-3-3 3-3-3zm-5 9h16v-2H4v2zm0-16h16V4H4v2z"/></svg>
+<span>OPS</span>
+</div>
+<div class="hud-item" onclick="switchView('network')">
+<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+<span>NET</span>
+</div>
+<div class="hud-item" onclick="switchView('vault')">
+<svg viewBox="0 0 24 24"><path d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2zM2 3v2h19V3H2zm0 12h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"/></svg>
+<span>VAULT</span>
+</div>
+<div class="hud-item" onclick="switchView('ranking')">
+<svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+<span>RANK</span>
+</div>
+<div class="hud-item" onclick="switchView('settings')">
+<svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L3.16 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.04.64.09.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.58 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+<span>SETTINGS</span>
+</div>
+</nav>
+<!-- MODALS -->
+<div class="modal-overlay" id="modalTransfer">
+<div class="modal-content">
+<div class="modal-close" onclick="closeModal('modalTransfer')">&times;</div>
+<h3 class="card-title" style="margin-bottom:18px;">TRANSFER LMB</h3>
+<input type="text" class="cyber-input" id="transferTo" placeholder="RECIPIENT USER ID">
+<input type="number" class="cyber-input" id="transferAmount" placeholder="AMOUNT (LMB)" step="0.001">
+<button class="cyber-btn" onclick="executeTransfer()">INITIATE TRANSFER</button>
+</div>
+</div>
+<div class="modal-overlay" id="modalReceive">
+<div class="modal-content">
+<div class="modal-close" onclick="closeModal('modalReceive')">&times;</div>
+<h3 class="card-title text-center" style="margin-bottom:18px;">RECEIVE LMB</h3>
+<div style="background:white; padding:18px; display:inline-block; margin-bottom:18px; margin-left:auto; margin-right:auto; display:block; width:fit-content; border-radius:var(--radius-md); box-shadow:0 10px 40px rgba(0,0,0,0.3);">
+<img id="qrCode" src="" width="140" height="140">
+</div>
+<div class="stat-label text-center">YOUR OPERATIVE ID</div>
+<div style="text-align:center; font-family:monospace; color:var(--primary); margin-bottom:18px; padding: 14px; background: rgba(0,243,255,0.12); border-radius: var(--radius-md); font-size: 14px;" id="receiveUserId">...</div>
+<button class="cyber-btn secondary" onclick="copyUserId()">COPY ID</button>
+</div>
+</div>
+<div class="wallet-modal" id="modalHistory">
+<div class="wallet-modal-content">
+<div class="wallet-modal-header">
+<div class="wallet-modal-title">Transaction History</div>
+<div class="close-modal-btn" onclick="closeModal('modalHistory')">&times;</div>
+</div>
+<div class="wallet-history-list" id="transactionList">
+<div class="text-center" style="color:var(--text-dim); padding:24px;">Loading history...</div>
+</div>
+</div>
+</div>
+<div class="wallet-modal" id="modalTonHistory">
+<div class="wallet-modal-content">
+<div class="wallet-modal-header">
+<div class="wallet-modal-title">TON Wallet History</div>
+<div class="close-modal-btn" onclick="closeModal('modalTonHistory')">&times;</div>
+</div>
+<div class="wallet-history-list" id="tonTransactionList">
+<div class="text-center" style="color:var(--text-dim); padding:24px;">Loading TON history...</div>
+</div>
+</div>
+</div>
+<div class="modal-overlay" id="modalTonSend">
+<div class="modal-content">
+<div class="modal-close" onclick="closeModal('modalTonSend')">&times;</div>
+<h3 class="card-title" style="margin-bottom:18px;">WITHDRAW TON</h3>
+<input type="text" class="cyber-input" id="tonRecipientAddress" placeholder="Recipient TON Address">
+<div class="swap-input-row">
+<input type="number" class="cyber-input" id="tonAmount" placeholder="Amount in TON" step="0.00001" min="0">
+<button class="max-btn" onclick="setMaxTon()">MAX</button>
+</div>
+<div style="text-align: right; font-size: 12px; color: var(--text-dim); margin-top: -8px; margin-bottom: 14px;">
+Available: <span id="tonSendAvailableBalance" style="color: var(--secondary);">0.00000 TON</span>
+</div>
+<div style="margin-bottom: 14px;">
+<label style="font-size:11px; color:var(--text-dim); margin-bottom:6px; display:block;">MEMO / COMMENT</label>
+<input type="text" class="cyber-input" id="tonMemo" placeholder="Auto-generated memo" readonly style="background: rgba(0,0,0,0.2); color: var(--text-secondary);">
+</div>
+<button class="cyber-btn" onclick="submitTonWithdrawal()">WITHDRAW TON</button>
+</div>
+</div>
+<div class="modal-overlay" id="modalReceiveTon">
+<div class="modal-content">
+<div class="modal-close" onclick="closeModal('modalReceiveTon')">&times;</div>
+<h3 class="card-title text-center" style="margin-bottom:18px;">RECEIVE TON</h3>
+<div style="color: #e74c3c; text-align: center; margin-bottom: 16px; border: 1px solid #e74c3c; padding: 10px; border-radius: 8px; background: rgba(231, 76, 60, 0.1);">
+SEND VALUE MUST NOT BE LOWER THAN 1 TON<br>OTHERWISE THE FUND WILL LOSE
+</div>
+<div class="text-center" style="margin-bottom:14px;">
+<div class="ton-qr-container" style="background: white; padding: 16px; border-radius: var(--radius-md); display: inline-block; box-shadow: 0 10px 42px rgba(0, 0, 0, 0.32);">
+<img id="depositQrCode2" src="" style="width:140px; height:140px;">
+</div>
+<div style="font-size:10px; color:var(--text-dim); margin-top:12px;">FOREST DEPOSIT ADDRESS</div>
+<div style="font-family:monospace; font-size:10px; color:var(--primary); margin-top:6px; word-break:break-all; padding: 10px; background: rgba(0,0,0,0.25); border-radius: var(--radius-sm);" id="depositAddressBox2">UQCstqbGYnWNiGYDJVxNSn1qhwMsgecJYIco-G3vTg9ArqY2</div>
+<button class="copy-btn" style="margin-top: 10px;" onclick="copyDepositAddress()">COPY ADDRESS</button>
+<div style="margin-top:16px; font-size:10px; color:var(--text-dim);">MEMO / COMMENT</div>
+<div style="font-family:monospace; font-size:10px; color:var(--secondary); margin-top:6px; word-break:break-all; padding: 10px; background: rgba(188,89,254,0.12); border-radius: var(--radius-sm); border:1px solid var(--border);" id="tonDepositMemo2">LUMEN<span id="memoUserId2">...</span></div>
+<button class="copy-btn" style="margin-top: 10px; background:rgba(188,89,254,0.18); border-color:var(--secondary); color:var(--secondary);" onclick="copyTonDepositMemo()">COPY MEMO</button>
+</div>
+</div>
+</div>
+<div class="modal-overlay" id="modalBCDeposit">
+<div class="modal-content">
+<div class="modal-close" onclick="closeModal('modalBCDeposit')">&times;</div>
+<h3 class="card-title" style="margin-bottom:18px;">FOREST DEPOSIT</h3>
+<p style="font-size:13px; color:var(--text-dim); text-align:center; margin-bottom:22px;">Select amount to deposit to your TON wallet</p>
+<div style="background:rgba(188,89,254,0.12); padding:18px; border-radius:var(--radius-md); margin-bottom:18px; border:1px solid rgba(188,89,254,0.35);">
+<div class="stat-label text-center" style="margin-bottom:10px;">SELECT AMOUNT</div>
+<div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:16px;">
+<button class="cyber-btn secondary" style="padding:8px 16px; font-size:11px;" onclick="setBCDepositAmount(1)">1 TON</button>
+<button class="cyber-btn secondary" style="padding:8px 16px; font-size:11px;" onclick="setBCDepositAmount(5)">5 TON</button>
+<button class="cyber-btn secondary" style="padding:8px 16px; font-size:11px;" onclick="setBCDepositAmount(10)">10 TON</button>
+</div>
+<p style="color: var(--accent); font-size: 12px; text-align: center; margin-bottom: 10px;">Minimum deposit: 1 TON</p>
+<input type="number" class="cyber-input" id="bcDepositAmount" placeholder="Min 1 TON" step="0.001" min="1">
+</div>
+<div style="display:flex; gap:12px; margin-top:24px;">
+<button class="cyber-btn secondary" onclick="closeModal('modalBCDeposit')" style="flex:1;">CANCEL</button>
+<button class="cyber-btn" id="btnConfirmBCDeposit" onclick="confirmBCDeposit()" style="flex:1;">CONFIRM</button>
+</div>
+</div>
+</div>
+<div class="modal-overlay" id="modalSpin">
+<div class="modal-content">
+<div class="modal-close" onclick="closeModal('modalSpin')">&times;</div>
+<h3 class="card-title text-center" style="margin-bottom:18px;">PROTOCOL SPIN</h3>
+<div style="position:relative; width:200px; height:200px; margin:24px auto;">
+<div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:12px solid transparent; border-right:12px solid transparent; border-top:24px solid var(--accent); z-index:10; filter: drop-shadow(0 0 8px var(--accent-glow));"></div>
+<canvas id="spinCanvas" style="width:100%; height:100%; border-radius:50%; box-shadow:0 0 30px var(--primary-glow);" width="200" height="200"></canvas>
+</div>
+<button class="cyber-btn" id="btnSpinAction" onclick="spinWheel()">SPIN</button>
+<div id="spinResult" style="text-align:center; margin-top:18px; font-family:'Orbitron'; color:var(--accent);"></div>
+</div>
+</div>
+<!-- Final Claim Info Modal -->
+<div class="modal-overlay" id="finalClaimInfoModal">
+<div class="modal-content">
+<div class="modal-close" onclick="closeModal('finalClaimInfoModal')">&times;</div>
+<h3 class="card-title" style="margin-bottom:18px;">System Sync Mechanics</h3>
+<div style="font-size:13px; color:var(--text-secondary); line-height:1.6;">
+<p style="margin-bottom:12px;"><strong>1. Auto-Mining:</strong> Mining continues automatically for up to <span style="color:var(--primary);">5 hours</span> while you are away.</p>
+<p style="margin-bottom:12px;"><strong>2. Timeout:</strong> If you don't return within 5 hours, mining pauses to prevent unfair offline accumulation.</p>
+<p style="margin-bottom:12px;"><strong>3. Final Claim:</strong> Click the <span style="color:var(--accent);">SYSTEM SYNC</span> button to collect your 5-hour offline rewards and instantly restart the mining cycle.</p>
+<p style="margin-bottom:12px;"><strong>4. Missed Time:</strong> Any time beyond the 5-hour window will not generate tokens until you claim and restart.</p>
+</div>
+<button class="cyber-btn" style="margin-top:16px;" onclick="closeModal('finalClaimInfoModal')">Got It!</button>
+</div>
+</div>
+<div class="info-modal-overlay" id="infoModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 10, 20, 0.92); backdrop-filter: blur(10px); z-index: 2001; display: none; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 200ms ease;">
+<div class="info-modal-content" style="background: var(--bg-surface-solid); border: 1px solid var(--primary); width: 100%; max-width: 420px; padding: 28px 24px; position: relative; box-shadow: var(--shadow-glow-lg); border-radius: var(--radius-lg); max-height: 90vh; overflow-y: auto; animation: modalSlide 300ms cubic-bezier(0.16, 1, 0.3, 1);">
+<div class="modal-close" onclick="closeInfoModal()">&times;</div>
+<div class="info-modal-title" style="font-family: 'Orbitron', sans-serif; font-size: 18px; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">How to Use Modules</div>
+<div class="info-modal-text" style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px;">Welcome to the <strong>Lumen Beam Module Workshop</strong>! Upgrade your defense grid with powerful modules that boost your credit generation.</div>
+<div class="info-modal-steps" style="background: rgba(0, 243, 255, 0.1); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin: 16px 0;">
+<strong>How to Buy & Equip:</strong>
+<ol style="margin: 0; padding-left: 20px; font-size: 12px; color: var(--text-dim);">
+<li><strong>Deposit TON</strong> to your connected TON wallet</li>
+<li><strong>Connect Wallet</strong> in the Secure Vault section</li>
+<li><strong>Browse Modules</strong> - Each module shows price in TON and mining rate</li>
+<li><strong>Click BUY</strong> - Confirm transaction in your wallet</li>
+<li><strong>Equip Instantly</strong> - Your grid updates and mining begins</li>
+</ol>
+</div>
+<div class="info-modal-note" style="font-size: 11px; color: var(--accent); background: rgba(255, 238, 0, 0.12); padding: 10px; border-radius: var(--radius-sm); border-left: 3px solid var(--accent);">Tip: Grid 1 always has the default module. Purchase modules to fill slots 2-10 for maximum mining power!</div>
+<button class="cyber-btn" style="margin-top:16px;" onclick="closeInfoModal()">Got It!</button>
+</div>
+</div>
+<div id="toast"><span class="status-dot"></span><span id="toastMsg">Notification</span></div>
+<script>
+// --- CONFIG & STATE ---
+const tg = window.Telegram.WebApp;
+tg.expand(); // Enable fullscreen mode
+tg.ready();
+// Initialize Firebase with UPDATED configuration
+const firebaseConfig = {
+apiKey: "AIzaSyCAyf3HizLe6s8N9Xa7ONXxI7UgWt-gZ3U",
+authDomain: "rabbit-kombat.firebaseapp.com",
+databaseURL: "https://rabbit-kombat-default-rtdb.firebaseio.com",
+projectId: "rabbit-kombat",
+storageBucket: "rabbit-kombat.firebasestorage.app",
+messagingSenderId: "726035321546",
+appId: "1:726035321546:web:b41785e7cd0e2f56d45a33",
+measurementId: "G-KT47V4N431"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const analytics = firebase.analytics();
+// CONSTANTS
+const AD_REWARD = 1;
+const REFERRAL_BONUS = 50;
+const REFERRAL_COMMISSION = 5;
+const DEFAULT_MODULE_RATE = 0.001;
+const SWAP_RATE = 0.0000005;
+const MAX_OFFLINE_HOURS = 5;
+const MAX_OFFLINE_SECONDS = MAX_OFFLINE_HOURS * 3600;
+const NFT_STAKING_DURATION = 30 * 24 * 60 * 60 * 1000;
+const NFT_APY = 0.25;
+const PRESALE_PRICE_PER_LMB = 0.000004;
+const MIN_TON_AMOUNT = 0.1;
+const DEPOSIT_WALLET = "UQCstqbGYnWNiGYDJVxNSn1qhwMsgecJYIco-G3vTg9ArqY2";
+const MAX_FREE_WITHDRAWALS = 2;
+const INITIAL_FREE_WITHDRAWALS = 1;
+// SVG ICONS FOR MODULES
+const moduleIcons = {
+firewall: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+cpu_core: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3"/></svg>',
+surveillance: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 12m-8 0a8 8 0 1 0 16 0a8 8 0 1 0 -16 0"/><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M12 5v-2M12 21v-2M5 12h-2M21 12h-2"/></svg>',
+satellite: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 3v18M3 12h18"/><path d="M12 12l4.5 4.5M12 12l-4.5 -4.5"/><circle cx="12" cy="12" r="2"/></svg>',
+quantum: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l-2 4h4l-2 -4zM12 22l-2 -4h4l-2 4zM2 12l4 -2v4l-4 -2zM22 12l-4 -2v4l4 -2z"/><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/></svg>',
+neural: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M12 2l2 5h4l-3 3 2 5h-4l-2 -4l-2 4h-4l2 -5l-3 -3h4z"/></svg>',
+plasma: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83 -2.83M16.24 7.76l2.83 -2.83"/><circle cx="12" cy="12" r="4"/></svg>',
+singularity: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 6a6 6 0 1 0 6 6"/><path d="M12 6a6 6 0 0 1 6 6"/><circle cx="12" cy="12" r="2"/></svg>'
+};
+// MODULE DATA
+const modulesData = [
+{ id: 'firewall', name: 'Firewall', price: 0.5, rate: 0.01 },
+{ id: 'cpu_core', name: 'CPU Core', price: 1.0, rate: 0.1 },
+{ id: 'surveillance', name: 'Drone Net', price: 2.5, rate: 0.5 },
+{ id: 'satellite', name: 'Uplink', price: 5.0, rate: 1 },
+{ id: 'quantum', name: 'Quantum Key', price: 15.0, rate: 1.5 },
+{ id: 'neural', name: 'Neural Net', price: 25.0, rate: 2 },
+{ id: 'plasma', name: 'Plasma Core', price: 50.0, rate: 2.5 },
+{ id: 'singularity', name: 'Singularity', price: 100.0, rate: 3 }
+];
+// NFT DATA
+const nftData = [
+{ id: 'nft1', name: 'Cyber Sentinel', image: 'https://i.postimg.cc/02zQGtF8/1778750873.png', description: 'A glowing defense matrix with emerald protocols, pulsing with raw security energy.', rarity: 'common', price: 5, miningRate: 0.01 },
+{ id: 'nft2', name: 'Data Guardian', image: 'https://i.postimg.cc/yNssGnQX/1778750878.png', description: 'An ancient firewall with gnarled golden roots pulsing with cyan data-streams.', rarity: 'rare', price: 25, miningRate: 0.05 },
+{ id: 'nft3', name: 'Quantum Shield', image: 'https://i.postimg.cc/g0QywJ0x/1778750934.png', description: 'A radiant shield with holographic petals and a diamond core, amplifying defense yields.', rarity: 'rare', price: 35, miningRate: 0.06 },
+{ id: 'nft4', name: 'Neural Cortex', image: 'https://i.postimg.cc/NjPmVMm7/1778750967.png', description: 'A metallic brain with golden circuits and glowing teal trunk, ancient tech fusion.', rarity: 'epic', price: 75, miningRate: 0.10 },
+{ id: 'nft5', name: 'Holo Defender', image: 'https://i.postimg.cc/Xq8yg7nH/1778750972.png', description: 'A cherry blossom branch with iridescent petals and electric sparks, blooming in digital springs.', rarity: 'legendary', price: 150, miningRate: 0.18 }
+];
+// BLOCK TYPES FOR MINT GAME
+const blockTypes = [
+{ id: 'b1', name: 'Crystal Core', color: '#00f3ff', rarity: 'Common', svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2-1-7 3.5L2 7l10 5zm0 4l-7-3.5L2 16l10 5 10-5-10-5z"/></svg>' },
+{ id: 'b2', name: 'Plasma Shard', color: '#bc13fe', rarity: 'Uncommon', svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4 8v8l8 6 8-6V8l-8-6z"/></svg>' },
+{ id: 'b3', name: 'Neon Cube', color: '#ff003c', rarity: 'Rare', svg: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>' },
+{ id: 'b4', name: 'Quantum Orb', color: '#0aff68', rarity: 'Epic', svg: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>' },
+{ id: 'b5', name: 'Void Prism', color: '#ffee00', rarity: 'Legendary', svg: '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 22,20 2,20"/></svg>' }
+];
+let state = {
+userId: null, balance: 0, tonBalance: 0, verified: false, tonConnected: false, tonAddress: null,
+streak: 0, lastSpin: 0, lastLogin: 0, language: 'EN', theme: 'dark', vibration: true,
+dailyStreakClaimed: false, lastStreakClaim: 0, completedTasks: {}, completedQuests: {},
+referrals: 0, totalReferralCommission: 0, milestoneRewards: {}, referredBy: null,
+ownedModules: [], equippedModules: {}, gridMining: {
+lastUpdated: 0, slots: [
+{ id: 0, moduleId: 'core', rate: DEFAULT_MODULE_RATE, active: true },
+{ id: 1, moduleId: null, rate: 0, active: false },
+{ id: 2, moduleId: null, rate: 0, active: false },
+{ id: 3, moduleId: null, rate: 0, active: false },
+{ id: 4, moduleId: null, rate: 0, active: false },
+{ id: 5, moduleId: null, rate: 0, active: false },
+{ id: 6, moduleId: null, rate: 0, active: false },
+{ id: 7, moduleId: null, rate: 0, active: false },
+{ id: 8, moduleId: null, rate: 0, active: false },
+{ id: 9, moduleId: null, rate: 0, active: false }
+]
+},
+adStats: { today: 0, yesterday: 0, thisWeek: 0, thisMonth: 0, lifetime: 0, lastAdDate: null, lastWeekReset: null, lastMonthReset: null },
+isNewUser: false, dataLoaded: false, initialized: false, telegramName: '', currentTaskTab: 'available',
+lifetimeUptimeSeconds: 0, sessionCount: 0, currentSessionStart: 0, purchaseHistory: {},
+withdrawalRequests: [], hapticEnabled: true, soundEnabled: true,
+freeWithdrawalsUsed: 0, isWithdrawalRestricted: false, lastDepositTimestamp: 0,
+heldBalance: 0, nftStakes: {}, presaleTokens: 0, pendingOfflineClaim: 0, isMiningPaused: false,
+rankingAvatarUnlocked: false, mintGrid: [], mintSelected: [], mintMatched: []
+};
+let miningInterval = null, balanceListener = null, referralListener = null, tonBalanceListener = null;
+let tasks = [], adLoading = false, saveTimeout = null, balanceSavePending = false;
+let tonConnectUI = null, manualConnectTriggered = false;
+let audioCtx = null;
+let lastTickTime = 0;
+let isViewTransitioning = false;
+let gameAnimationId;
+
+// --- UI CLICK SOUND SYSTEM ---
+function playUIClickSound() {
+    if (!state.soundEnabled) return;
+    initAudio();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.05);
+    gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.06);
+}
+
+// Attach global click sound to all interactive elements
+document.addEventListener('click', (e) => {
+    const target = e.target.closest('button, a, .hud-item, .task-card, .owned-module-card, .nft-card, .wallet-action-btn, .copy-btn, .max-btn, .info-btn, .task-tab, .mint-btn-action, .back-btn, .modal-close');
+    if (target) {
+        playUIClickSound();
+    }
+});
+
+// --- TELEGRAM BOT API INTEGRATION ---
+// Setup BackButton for navigation
+function setupTelegramBackButton() {
+if (tg.BackButton) {
+tg.BackButton.onClick(() => {
+// Handle back navigation - go to previous view or close app
+const currentView = document.querySelector('.view-section.active');
+if (currentView && currentView.id !== 'view-hq') {
+// If not on home view, go back to HQ
+switchView('hq');
+} else {
+// If on home view, close the app
+tg.close();
+}
+});
+}
+}
+function updateBackButtonVisibility(viewId) {
+if (tg.BackButton) {
+if (viewId === 'hq') {
+tg.BackButton.hide();
+} else {
+tg.BackButton.show();
+}
+}
+}
+// --- AUDIO SYSTEM ---
+function initAudio() { if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } }
+function playTone(freq = 800, duration = 0.08) {
+if (!state.soundEnabled) return;
+initAudio();
+if (audioCtx.state === 'suspended') audioCtx.resume();
+const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+osc.connect(gain); gain.connect(audioCtx.destination);
+osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+osc.start(); osc.stop(audioCtx.currentTime + duration);
+}
+function triggerHaptic() { if (state.hapticEnabled && tg.HapticFeedback) { tg.HapticFeedback.impactOccurred('light'); } }
+// --- UTILITY ---
+function now() { return Math.floor(Date.now() / 1000); }
+function nowMs() { return Date.now(); }
+function validateNumber(value, defaultValue = 0) { if (typeof value === 'number' && !isNaN(value) && isFinite(value)) return Math.max(0, value); return defaultValue; }
+function getToday() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+function getWeekStart() { const d = new Date(); const day = d.getDay(); const diff = d.getDate() - day + (day === 0 ? -6 : 1); d.setDate(diff); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+function getMonthStart() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`; }
+function formatTime(seconds) { const h = Math.floor(seconds / 3600).toString().padStart(2, '0'), m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0'), s = (seconds % 60).toString().padStart(2, '0'); return `${h}:${m}:${s}`; }
+function notify(msg) { playTone(600, 0.05); const t = document.getElementById('toast'), m = document.getElementById('toastMsg'); m.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); if (state.hapticEnabled && navigator.vibrate) navigator.vibrate(50); }
+function closeModal(id) { playTone(400, 0.05); document.getElementById(id).style.display = 'none'; }
+function openInfoModal() { playTone(700, 0.05); document.getElementById('infoModal').style.display = 'flex'; }
+function closeInfoModal() { playTone(500, 0.05); document.getElementById('infoModal').style.display = 'none'; }
+function openFinalClaimInfo() { playTone(700, 0.05); document.getElementById('finalClaimInfoModal').style.display = 'flex'; }
+function showComingSoon(feature) { notify(`${feature} - Coming Soon! Please wait for the next update.`); }
+function openReceiveModal() {
+triggerHaptic();
+document.getElementById('depositQrCode2').src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${DEPOSIT_WALLET}`;
+document.getElementById('depositAddressBox2').textContent = DEPOSIT_WALLET;
+document.getElementById('memoUserId2').textContent = state.userId;
+document.getElementById('modalReceiveTon').style.display = 'flex';
+}
+// --- SHARE FUNCTIONS ---
+function getShareText() { return "🔐 I'm earning $LMB tokens in Lumen Beam! Join the Protocol Defense now and secure the network! ⚡✨"; }
+function getShareLink() { return `https://t.me/LumenBeam_bot/start?startapp=${state.userId}`; }
+function shareToX() { triggerHaptic(); const url = `https://x.com/intent/tweet?text=${encodeURIComponent(getShareText())}&url=${encodeURIComponent(getShareLink())}`; window.open(url, '_blank'); }
+function shareToTelegram() { triggerHaptic(); const url = `https://t.me/share/url?url=${encodeURIComponent(getShareLink())}&text=${encodeURIComponent(getShareText())}`; window.open(url, '_blank'); }
+// --- FINAL CLAIM ---
+async function executeFinalClaim() {
+triggerHaptic();
+if (!state.isMiningPaused || state.pendingOfflineClaim <= 0) return;
+state.balance += state.pendingOfflineClaim;
+state.pendingOfflineClaim = 0;
+state.isMiningPaused = false;
+state.gridMining.lastUpdated = now();
+await db.ref('users/' + state.userId).update({ balance: state.balance, gridMining: state.gridMining, pendingOfflineClaim: 0, isMiningPaused: false });
+updateBalanceUI();
+renderDefenseGrid();
+updateMiningUI();
+startLiveMining();
+document.getElementById('btnFinalClaim').disabled = true;
+document.getElementById('btnFinalClaim').innerHTML = 'SYSTEM SYNC';
+notify(`Claimed ${state.pendingOfflineClaim.toFixed(3)} LMB offline rewards! Mining restarted.`);
+}
+// --- MINT BLOCK GAME ---
+function openMintGame() { triggerHaptic(); switchView('mintgame'); initMintGrid(); }
+function initMintGrid() {
+const gridEl = document.getElementById('mintGrid');
+if (!gridEl) return;
+state.mintGrid = [];
+state.mintSelected = [];
+state.mintMatched = [];
+document.getElementById('btnMintBlock').disabled = true;
+let html = '';
+for (let i = 0; i < 25; i++) {
+const type = blockTypes[Math.floor(Math.random() * blockTypes.length)];
+state.mintGrid.push(type);
+html += `<div class="block-cell" data-idx="${i}" data-type="${type.id}" onclick="handleBlockClick(${i})">
+<div class="gallery-icon" style="color: ${type.color}">${type.svg}</div>
+</div>`;
+}
+gridEl.innerHTML = html;
+}
+function handleBlockClick(idx) {
+triggerHaptic();
+if (state.mintMatched.includes(idx)) return;
+const cell = document.querySelector(`.block-cell[data-idx="${idx}"]`);
+if (state.mintSelected.includes(idx)) {
+state.mintSelected = state.mintSelected.filter(i => i !== idx);
+cell.classList.remove('selected');
+} else {
+if (state.mintSelected.length >= 4) return;
+state.mintSelected.push(idx);
+cell.classList.add('selected');
+}
+checkMintReady();
+}
+function checkMintReady() {
+if (state.mintSelected.length !== 4) { document.getElementById('btnMintBlock').disabled = true; return; }
+const types = state.mintSelected.map(i => state.mintGrid[i].id);
+if (types.every(t => t === types[0])) {
+state.mintMatched = [...state.mintSelected];
+state.mintMatched.forEach(i => {
+document.querySelector(`.block-cell[data-idx="${i}"]`).classList.add('matched');
+});
+document.getElementById('btnMintBlock').disabled = false;
+} else {
+state.mintSelected.forEach(i => {
+const cell = document.querySelector(`.block-cell[data-idx="${i}"]`);
+cell.classList.remove('selected');
+});
+state.mintSelected = [];
+document.getElementById('btnMintBlock').disabled = true;
+notify("Blocks don't match. Try again!");
+}
+}
+async function executeMint() {
+triggerHaptic();
+state.balance += 1;
+state.mintMatched.forEach(i => {
+const type = blockTypes[Math.floor(Math.random() * blockTypes.length)];
+state.mintGrid[i] = type;
+const cell = document.querySelector(`.block-cell[data-idx="${i}"]`);
+cell.classList.remove('selected', 'matched');
+cell.dataset.type = type.id;
+cell.querySelector('.gallery-icon').style.color = type.color;
+cell.querySelector('.gallery-icon').innerHTML = type.svg;
+});
+state.mintSelected = [];
+state.mintMatched = [];
+document.getElementById('btnMintBlock').disabled = true;
+await db.ref('users/' + state.userId).update({ balance: state.balance });
+updateBalanceUI();
+notify("Block Minted! +1 LMB");
+initMintGrid();
+}
+function resetMintGrid() { triggerHaptic(); initMintGrid(); }
+// BLOCKS GALLERY
+function renderBlocksGallery() {
+const container = document.getElementById('blocksGallery');
+if (!container) return;
+let html = '';
+blockTypes.forEach(b => {
+html += `<div class="gallery-item"><div class="gallery-icon" style="color: ${b.color}">${b.svg}</div><div class="gallery-name">${b.name}</div><div class="gallery-rarity">${b.rarity}</div></div>`;
+});
+container.innerHTML = html;
+}
+// --- NFT STAKING ---
+function openNFTView() { triggerHaptic(); switchView('nft'); renderNFTs(); updateTotalStakedValue(); }
+function renderNFTs() {
+const grid = document.getElementById('nftGrid'); if (!grid) return; let html = '';
+nftData.forEach(nft => {
+const stake = state.nftStakes[nft.id], isStaked = stake && stake.staked, rarityClass = `rarity-${nft.rarity}`;
+if (isStaked) {
+const timeRemaining = stake.endTime - nowMs(), canUnstake = timeRemaining <= 0, reward = stake.principal * NFT_APY;
+html += `<div class="nft-card staked"><div class="nft-badge">STAKED</div><div class="nft-card-header"><img src="${nft.image}" class="nft-image" alt="${nft.name}"><div class="nft-info"><div class="nft-name">${nft.name}</div><div class="nft-rarity ${rarityClass}">${nft.rarity}</div></div></div><div class="nft-description">${nft.description}</div><div class="nft-stats"><div class="nft-stat"><div class="nft-stat-label">Staked</div><div class="nft-stat-value">${nft.price} TON</div></div><div class="nft-stat"><div class="nft-stat-label">Reward</div><div class="nft-stat-value">+${reward.toFixed(2)} TON</div></div><div class="nft-stat"><div class="nft-stat-label">APY</div><div class="nft-stat-value">25%</div></div></div>${!canUnstake ? `<div class="staking-timer"><div class="timer-label-small">Time Remaining</div><div class="timer-value-small" id="timer-${nft.id}">${formatStakingTime(timeRemaining)}</div></div>` : ''}<div class="nft-actions"><button class="unstake-btn" onclick="unstakeNFT('${nft.id}')" ${!canUnstake ? 'disabled' : ''}>${canUnstake ? 'UNSTAKE + CLAIM' : 'LOCKED'}</button></div></div>`;
+} else {
+html += `<div class="nft-card"><div class="nft-card-header"><img src="${nft.image}" class="nft-image" alt="${nft.name}"><div class="nft-info"><div class="nft-name">${nft.name}</div><div class="nft-rarity ${rarityClass}">${nft.rarity}</div></div></div><div class="nft-description">${nft.description}</div><div class="nft-stats"><div class="nft-stat"><div class="nft-stat-label">Price</div><div class="nft-stat-value">${nft.price} TON</div></div><div class="nft-stat"><div class="nft-stat-label">Mining</div><div class="nft-stat-value">${nft.miningRate} GH/s</div></div><div class="nft-stat"><div class="nft-stat-label">APY</div><div class="nft-stat-value">25%</div></div></div><div class="nft-actions"><button class="stake-btn" onclick="stakeNFT('${nft.id}')" ${state.tonBalance < nft.price ? 'disabled' : ''}>STAKE NFT</button></div></div>`;
+}
+});
+grid.innerHTML = html;
+}
+function formatStakingTime(ms) { if (ms <= 0) return '00:00:00:00'; const days = Math.floor(ms / (1000 * 60 * 60 * 24)), hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)), minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60)), seconds = Math.floor((ms % (1000 * 60)) / 1000); return `${String(days).padStart(2,'0')}:${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`; }
+async function stakeNFT(nftId) { triggerHaptic(); const nft = nftData.find(n => n.id === nftId); if (!nft) return; if (state.tonBalance < nft.price) { notify(`Insufficient TON! Need ${nft.price} TON`); return; } if (!confirm(`Stake ${nft.name} for 30 days at ${nft.price} TON? You'll earn 25% APY!`)) return; try { state.tonBalance -= nft.price; state.nftStakes[nftId] = { staked: true, principal: nft.price, startTime: nowMs(), endTime: nowMs() + NFT_STAKING_DURATION }; await db.ref('users/' + state.userId).update({ tonBalance: state.tonBalance, nftStakes: state.nftStakes }); updateTonUI(); renderNFTs(); updateTotalStakedValue(); notify(`${nft.name} staked successfully!`); } catch (error) { console.error("Staking error:", error); state.tonBalance += nft.price; notify("Staking failed. Please try again."); } }
+async function unstakeNFT(nftId) { triggerHaptic(); const stake = state.nftStakes[nftId]; if (!stake || !stake.staked) return; const timeRemaining = stake.endTime - nowMs(); if (timeRemaining > 0) { notify("Staking period not complete yet!"); return; } const nft = nftData.find(n => n.id === nftId), reward = stake.principal * NFT_APY, totalReturn = stake.principal + reward; if (!confirm(`Unstake and claim ${totalReturn.toFixed(2)} TON? (Principal: ${stake.principal} TON + Reward: ${reward.toFixed(2)} TON)`)) return; try { state.tonBalance += totalReturn; delete state.nftStakes[nftId]; await db.ref('users/' + state.userId).update({ tonBalance: state.tonBalance, nftStakes: state.nftStakes }); updateTonUI(); renderNFTs(); updateTotalStakedValue(); notify(`Unstaked! Received ${totalReturn.toFixed(2)} TON`); } catch (error) { console.error("Unstaking error:", error); notify("Unstaking failed. Please try again."); } }
+function updateTotalStakedValue() { let total = 0; Object.values(state.nftStakes).forEach(stake => { if (stake.staked) total += stake.principal; }); document.getElementById('totalStakedValue').textContent = total.toFixed(2) + ' TON'; }
+function startNFTTimers() { setInterval(() => { if (document.getElementById('view-nft')?.classList?.contains('active')) { Object.keys(state.nftStakes).forEach(nftId => { const stake = state.nftStakes[nftId]; if (stake && stake.staked) { const timeRemaining = stake.endTime - nowMs(), timerEl = document.getElementById(`timer-${nftId}`); if (timerEl && timeRemaining > 0) { timerEl.textContent = formatStakingTime(timeRemaining); } } }); } }, 1000); }
+// --- WITHDRAWAL RESTRICTION ---
+function checkWithdrawalRestriction() { if (state.isWithdrawalRestricted) { notify("Account restricted - can't withdraw now. Deposit to unrestrict your account"); return false; } return true; }
+function unrestrictWithdrawal() { state.freeWithdrawalsUsed = 0; state.isWithdrawalRestricted = false; state.lastDepositTimestamp = now(); notify("Account unrestricted! You can now withdraw again."); }
+// --- REAL-TIME MINING ---
+function getTotalMiningRate() { let rate = 0; state.gridMining.slots.forEach(slot => { if (slot.active) rate += slot.rate; }); return rate; }
+function startLiveMining() {
+lastTickTime = Date.now();
+const offlineSec = Math.floor((Date.now()/1000) - (state.gridMining.lastUpdated || now())), claimableSec = Math.min(offlineSec, MAX_OFFLINE_SECONDS);
+if (claimableSec > 10 && !state.isMiningPaused) {
+const rate = getTotalMiningRate(), earned = rate * claimableSec;
+if (offlineSec > MAX_OFFLINE_SECONDS) { state.pendingOfflineClaim = earned; state.isMiningPaused = true; notify("Mining paused. Claim your offline rewards to resume."); document.getElementById('btnFinalClaim').disabled = false; document.getElementById('btnFinalClaim').innerHTML = `CLAIM (${earned.toFixed(3)} LMB)`; } else { state.balance += earned; updateBalanceUI(); notify(`Welcome back! Earned +${earned.toFixed(3)} LMB while away.`); }
+db.ref('users/' + state.userId).update({ balance: state.balance, pendingOfflineClaim: state.pendingOfflineClaim, isMiningPaused: state.isMiningPaused, gridMining: { lastUpdated: now(), slots: state.gridMining.slots } });
+}
+if (miningInterval) clearInterval(miningInterval); if (state.isMiningPaused) return;
+miningInterval = setInterval(() => { const nowTime = Date.now(), deltaSec = (nowTime - lastTickTime) / 1000; lastTickTime = nowTime; if (deltaSec > 0 && !state.isMiningPaused) { const rate = getTotalMiningRate(); if (rate > 0) { const earned = rate * deltaSec; state.balance += earned; updateBalanceUI(); } } updateMiningUI(); }, 100);
+setInterval(() => { if (state.userId && state.dataLoaded && !state.isMiningPaused) { state.gridMining.lastUpdated = now(); saveUserData(true); } }, 15000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && state.userId && state.dataLoaded) { state.gridMining.lastUpdated = now(); saveUserData(true); } });
+// Removed beforeunload listener to prevent browser warning. visibilitychange handles saving.
+}
+function updateMiningUI() { const totalRate = getTotalMiningRate(); document.getElementById('totalMiningRate').textContent = `${totalRate.toFixed(2)} GH/s`; document.getElementById('currentMiningSpeed').textContent = `${totalRate.toFixed(2)} GH/s`; document.getElementById('gridMiningRate').textContent = `${totalRate.toFixed(2)} GH/s`; }
+function renderDefenseGrid() {
+const grid = document.getElementById('defenseGrid'); let html = '';
+state.gridMining.slots.forEach((slot, index) => {
+const isActive = slot.active;
+let iconHtml = '<div class="defense-slot-icon"><img src="https://i.postimg.cc/mgXqzMrJ/137916922.webp" style="width:100%;height:100%;object-fit:contain;"></div>';
+if (isActive) {
+if (slot.moduleId === 'core') iconHtml = `<div class="defense-slot-icon">${moduleIcons.cpu_core}</div>`;
+else { const mod = modulesData.find(m => m.id === slot.moduleId); if (mod) iconHtml = `<div class="defense-slot-icon">${moduleIcons[mod.id]}</div>`; }
+}
+html += `<div class="defense-slot ${isActive ? 'active' : 'empty'} ${slot.isEquipping ? 'equipping' : ''}" onclick="${index === 0 ? '' : `openModuleSlot(${index})`}">${isActive ? '<div class="defense-slot-badge">ACTIVE</div>' : ''}${iconHtml}<div class="defense-slot-name">${slot.moduleId === 'core' ? 'Core' : (slot.moduleId ? modulesData.find(s => s.id === slot.moduleId)?.name || 'Unknown' : 'Empty Slot')}</div><div class="defense-slot-rate">${slot.rate.toFixed(2)} GH/s</div>${!isActive ? '<div class="grid-slot-earned">Tap to equip</div>' : ''}</div>`;
+});
+grid.innerHTML = html;
+}
+function openModuleSlot(slotIndex) { if (slotIndex === 0) return; triggerHaptic(); switchView('workshop'); }
+function equipModuleToSlot(moduleId, slotIndex) {
+const module = modulesData.find(s => s.id === moduleId); if (!module) return;
+if (!state.ownedModules.includes(moduleId)) { notify("Module not owned"); return; }
+// Unequip from any existing slot first
+for(let i=0; i<state.gridMining.slots.length; i++) {
+if (state.gridMining.slots[i].moduleId === moduleId && i !== slotIndex) {
+state.gridMining.slots[i].moduleId = null;
+state.gridMining.slots[i].rate = 0;
+state.gridMining.slots[i].active = false;
+}
+}
+// Equip to target
+state.gridMining.slots[slotIndex].moduleId = moduleId;
+state.gridMining.slots[slotIndex].rate = module.rate;
+state.gridMining.slots[slotIndex].active = true;
+const gridSlots = document.querySelectorAll('.defense-slot');
+if (gridSlots[slotIndex]) { gridSlots[slotIndex].classList.add('equipping'); setTimeout(() => gridSlots[slotIndex].classList.remove('equipping'), 600); }
+triggerHaptic();
+state.gridMining.lastUpdated = now();
+db.ref('users/' + state.userId).update({ gridMining: state.gridMining });
+renderDefenseGrid();
+updateMiningUI();
+renderModuleStore();
+notify(`${module.name} equipped to slot ${slotIndex + 1}`);
+}
+function unequipModuleFromSlot(moduleId) {
+const slotIndex = state.gridMining.slots.findIndex(s => s.moduleId === moduleId);
+if (slotIndex === -1 || slotIndex === 0) { notify("Cannot unequip this module"); return; }
+state.gridMining.slots[slotIndex].moduleId = null;
+state.gridMining.slots[slotIndex].rate = 0;
+state.gridMining.slots[slotIndex].active = false;
+const gridSlots = document.querySelectorAll('.defense-slot');
+if (gridSlots[slotIndex]) { gridSlots[slotIndex].classList.add('equipping'); setTimeout(() => gridSlots[slotIndex].classList.remove('equipping'), 600); }
+triggerHaptic();
+state.gridMining.lastUpdated = now();
+db.ref('users/' + state.userId).update({ gridMining: state.gridMining });
+renderDefenseGrid();
+updateMiningUI();
+renderModuleStore();
+notify(`${modulesData.find(s => s.id === moduleId)?.name || 'Module'} unequipped`);
+}
+// --- MODULE STORE ---
+function openModuleStore() { triggerHaptic(); switchView('workshop'); renderModuleStore(); }
+function renderModuleStore() {
+document.getElementById('moduleTonBalance').textContent = state.tonBalance.toFixed(5) + ' TON';
+const ownedContainer = document.getElementById('ownedModulesList');
+if (state.ownedModules && state.ownedModules.length > 0) {
+let ownedHtml = '';
+state.ownedModules.forEach(moduleId => {
+const module = modulesData.find(s => s.id === moduleId);
+if (!module) return;
+const isEquipped = state.gridMining.slots.some(slot => slot.moduleId === moduleId);
+ownedHtml += `<div class="owned-module-card ${isEquipped ? 'equipped' : ''}"><div class="owned-module-badge">${isEquipped ? 'EQUIPPED' : ''}</div><div class="owned-module-icon">${moduleIcons[module.id]}</div><div class="owned-module-name">${module.name}</div><div style="font-size:10px; color:var(--primary); margin-bottom:6px;">${module.rate.toFixed(2)} GH/s</div><div class="module-actions"><button class="equip-btn ${isEquipped ? 'equipped' : ''}" onclick="${isEquipped ? '' : `showEquipOptions('${module.id}')`}" ${isEquipped ? 'disabled' : ''}>${isEquipped ? 'EQUIPPED' : 'EQUIP'}</button><button class="unequip-btn" onclick="${isEquipped ? `unequipModuleFromSlot('${module.id}')` : ''}" ${!isEquipped ? 'disabled' : ''}>${isEquipped ? 'UNEQUIP' : 'UNEQUIP'}</button></div></div>`;
+});
+ownedContainer.innerHTML = ownedHtml;
+} else { ownedContainer.innerHTML = `<div style="grid-column: 1 / -1; text-align:center; color:var(--text-dim); padding:20px; border:1px dashed var(--border); border-radius:var(--radius-md);">No modules owned yet.</div>`; }
+const container = document.getElementById('moduleStoreList'); let html = '';
+modulesData.forEach(module => { const isOwned = state.ownedModules.includes(module.id), canAfford = state.tonBalance >= module.price; html += `<div class="module-card" onclick="${isOwned ? '' : `buyModule('${module.id}')`}"><div class="module-icon">${moduleIcons[module.id]}</div><div class="module-info"><div class="module-tier">${module.name}</div><div class="module-desc">${module.rate.toFixed(2)} GH/s mining rate</div><div class="module-stats"><span class="module-stat">⚡ ${module.rate.toFixed(2)} GH/s</span></div></div><div style="text-align:right;"><div style="display:flex; align-items:center; gap:6px; justify-content:flex-end; font-family:'Orbitron'; color:var(--secondary); margin-bottom:8px;"><img src="https://i.postimg.cc/Vs2Tm71N/15208522.png" style="width:16px; height:16px; object-fit:contain;">${module.price} TON</div><button class="module-buy-btn ${isOwned ? 'owned' : ''}" ${isOwned || !canAfford ? 'disabled' : ''} onclick="event.stopPropagation(); buyModule('${module.id}')">${isOwned ? 'OWNED' : (canAfford ? 'BUY' : 'NEED MORE')}</button></div></div>`; });
+container.innerHTML = html;
+}
+function showEquipOptions(moduleId) { triggerHaptic(); const availableSlots = state.gridMining.slots.map((slot, idx) => idx).filter(idx => idx !== 0 && (!state.gridMining.slots[idx].active || state.gridMining.slots[idx].moduleId === moduleId)); if (availableSlots.length === 0) { notify("No available slots"); return; } const slotIndex = availableSlots[0]; equipModuleToSlot(moduleId, slotIndex); }
+async function buyModule(moduleId) { triggerHaptic(); const module = modulesData.find(s => s.id === moduleId); if (!module) return; if (state.ownedModules.includes(moduleId)) { notify("Already owned"); return; } if (state.tonBalance < module.price) { notify(`Insufficient TON! Need ${module.price} TON`); return; } state.tonBalance -= module.price; if (!state.ownedModules) state.ownedModules = []; state.ownedModules.push(moduleId); if (!state.purchaseHistory) state.purchaseHistory = {}; state.purchaseHistory[moduleId] = Date.now(); await db.ref('users/' + state.userId).update({ tonBalance: state.tonBalance, ownedModules: state.ownedModules, purchaseHistory: state.purchaseHistory }); updateBalanceUI(); updateTonUI(); renderModuleStore(); notify("Module purchased! Go to 'My Modules' to equip it."); }
+// --- USER DATA ---
+function loadUserData() {
+document.getElementById('loaderText').textContent = "Loading operative profile...";
+db.ref('users/' + state.userId).once('value').then(snap => {
+const data = snap.val(); if (data && typeof data === 'object') {
+state.isNewUser = false; state.balance = validateNumber(data.balance, 0); state.tonBalance = validateNumber(data.tonBalance, 0); state.verified = data.miningVerified === true; state.tonAddress = data.tonWallet || null; state.streak = validateNumber(data.streak, 0); state.lastSpin = validateNumber(data.lastSpin, 0); state.lastStreakClaim = validateNumber(data.lastStreakClaim, 0); state.dailyStreakClaimed = data.dailyStreakClaimed === true; state.language = data.language || 'EN'; state.theme = data.selectedTheme || 'dark'; state.hapticEnabled = data.hapticEnabled !== false; state.soundEnabled = data.soundEnabled !== false; state.completedTasks = data.completedTasks || {}; state.completedQuests = data.completedQuests || {}; state.ownedModules = data.ownedModules || []; state.purchaseHistory = data.purchaseHistory || {}; state.freeWithdrawalsUsed = validateNumber(data.freeWithdrawalsUsed, 0); state.isWithdrawalRestricted = data.isWithdrawalRestricted === true; state.lastDepositTimestamp = validateNumber(data.lastDepositTimestamp, 0); state.heldBalance = validateNumber(data.heldBalance, 0); state.nftStakes = data.nftStakes || {}; state.presaleTokens = validateNumber(data.presaleTokens, 0); state.pendingOfflineClaim = validateNumber(data.pendingOfflineClaim, 0); state.isMiningPaused = data.isMiningPaused === true; state.rankingAvatarUnlocked = data.rankingAvatarUnlocked === true;
+if (state.isMiningPaused && state.pendingOfflineClaim > 0) { document.getElementById('btnFinalClaim').disabled = false; document.getElementById('btnFinalClaim').innerHTML = `CLAIM (${state.pendingOfflineClaim.toFixed(3)} LMB)`; }
+if (state.rankingAvatarUnlocked) { document.getElementById('btnUnlockAvatar').style.display = 'none'; document.getElementById('avatarStatus').style.display = 'block'; }
+if (data.gridMining && typeof data.gridMining === 'object') { state.gridMining.lastUpdated = validateNumber(data.gridMining.lastUpdated, 0); if (data.gridMining.slots && Array.isArray(data.gridMining.slots)) { state.gridMining.slots = data.gridMining.slots.map((slot, idx) => ({ id: idx, moduleId: slot.moduleId || null, rate: validateNumber(slot.rate, 0), active: slot.active === true })); while (state.gridMining.slots.length < 10) { state.gridMining.slots.push({ id: state.gridMining.slots.length, moduleId: null, rate: 0, active: false }); } state.gridMining.slots[0] = { id: 0, moduleId: 'core', rate: DEFAULT_MODULE_RATE, active: true }; } } else { state.gridMining.lastUpdated = now(); }
+if (data.adStats && typeof data.adStats === 'object') { state.adStats = { today: validateNumber(data.adStats.today, 0), yesterday: validateNumber(data.adStats.yesterday, 0), thisWeek: validateNumber(data.adStats.thisWeek, 0), thisMonth: validateNumber(data.adStats.thisMonth, 0), lifetime: validateNumber(data.adStats.lifetime, 0), lastAdDate: data.adStats.lastAdDate || getToday(), lastWeekReset: data.adStats.lastWeekReset || getWeekStart(), lastMonthReset: data.adStats.lastMonthReset || getMonthStart() }; }
+state.milestoneRewards = data.milestoneRewards || {}; state.referredBy = data.referredBy || null; state.totalReferralCommission = validateNumber(data.totalReferralCommission, 0); state.referrals = validateNumber(data.referrals, 0); state.withdrawalRequests = data.withdrawalRequests || []; if (state.tonAddress) { state.tonConnected = true; updateTonUI(); } applyTheme(state.theme); setLanguage(state.language); updatePreferenceButtons(); state.dataLoaded = true;
+} else { state.isNewUser = true; createNewUser(); state.dataLoaded = true; }
+state.initialized = true; setupRealtimeListeners(); resetAdStatsIfNeeded(); processStartParam(); loadAdminData(); updateAllUI(); renderDefenseGrid(); updateMiningUI(); startLiveMining(); setupEventListeners(); startMarketEngine(); initLifetimeUptime(); startMonetagAds(); startNFTTimers(); renderBlocksGallery(); setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500);
+}).catch(error => { console.error("Error loading user data", error); document.getElementById('loader').style.display = 'none'; notify("Error loading data. Please refresh."); });
+}
+function createNewUser() {
+const newUser = { name: tg.initDataUnsafe?.user?.first_name || 'Operative', avatar: tg.initDataUnsafe?.user?.photo_url || '', balance: 0, createdAt: now(), farmingActive: false, adStats: { today: 0, yesterday: 0, thisWeek: 0, thisMonth: 0, lifetime: 0, lastAdDate: getToday(), lastWeekReset: getWeekStart(), lastMonthReset: getMonthStart() }, milestoneRewards: {}, completedTasks: {}, completedQuests: {}, selectedTheme: 'dark', language: 'EN', vibrationEnabled: true, hapticEnabled: true, soundEnabled: true, streak: 0, lastSpin: 0, lastLogin: now(), lastStreakClaim: 0, dailyStreakClaimed: false, miningVerified: false, referrals: 0, totalReferralCommission: 0, referredBy: null, tonWallet: null, tonBalance: 0, ownedModules: [], gridMining: { lastUpdated: now(), slots: [{ id: 0, moduleId: 'core', rate: DEFAULT_MODULE_RATE, active: true }] }, purchaseHistory: {}, withdrawalRequests: [], freeWithdrawalsUsed: 0, isWithdrawalRestricted: false, lastDepositTimestamp: 0, heldBalance: 0, nftStakes: {}, presaleTokens: 0, pendingOfflineClaim: 0, isMiningPaused: false, rankingAvatarUnlocked: false };
+db.ref('users/' + state.userId).set(newUser); state.balance = 0; state.isNewUser = true; state.dataLoaded = true; state.gridMining.lastUpdated = now();
+}
+function saveUserData(silent = false) {
+if (!state.userId || !state.dataLoaded || balanceSavePending) return; if (saveTimeout) clearTimeout(saveTimeout);
+saveTimeout = setTimeout(() => { balanceSavePending = true;
+const updates = { balance: validateNumber(state.balance, 0), tonWallet: state.tonAddress || null, tonBalance: validateNumber(state.tonBalance, 0), vibrationEnabled: !!state.hapticEnabled, hapticEnabled: !!state.hapticEnabled, soundEnabled: !!state.soundEnabled, selectedTheme: state.theme || 'dark', language: state.language || 'EN', streak: validateNumber(state.streak, 0), lastSpin: validateNumber(state.lastSpin, 0), adStats: { today: validateNumber(state.adStats?.today, 0), yesterday: validateNumber(state.adStats?.yesterday, 0), thisWeek: validateNumber(state.adStats?.thisWeek, 0), thisMonth: validateNumber(state.adStats?.thisMonth, 0), lifetime: validateNumber(state.adStats?.lifetime, 0), lastAdDate: state.adStats?.lastAdDate || getToday(), lastWeekReset: state.adStats?.lastWeekReset || getWeekStart(), lastMonthReset: state.adStats?.lastMonthReset || getMonthStart() }, totalReferralCommission: validateNumber(state.totalReferralCommission, 0), milestoneRewards: state.milestoneRewards || {}, completedTasks: state.completedTasks || {}, completedQuests: state.completedQuests || {}, dailyStreakClaimed: !!state.dailyStreakClaimed, lastStreakClaim: validateNumber(state.lastStreakClaim, 0), lastLogin: now(), miningVerified: !!state.verified, referrals: validateNumber(state.referrals, 0), referredBy: state.referredBy || null, ownedModules: state.ownedModules, purchaseHistory: state.purchaseHistory || {}, gridMining: state.gridMining, withdrawalRequests: state.withdrawalRequests || [], freeWithdrawalsUsed: state.freeWithdrawalsUsed, isWithdrawalRestricted: state.isWithdrawalRestricted, lastDepositTimestamp: state.lastDepositTimestamp, heldBalance: state.heldBalance || 0, nftStakes: state.nftStakes || {}, presaleTokens: state.presaleTokens || 0, pendingOfflineClaim: state.pendingOfflineClaim || 0, isMiningPaused: state.isMiningPaused || false, rankingAvatarUnlocked: !!state.rankingAvatarUnlocked };
+db.ref('users/' + state.userId).update(updates).then(() => { balanceSavePending = false; if(!silent) notify("Progress saved"); }).catch(err => { console.error("Save error:", err); balanceSavePending = false; });
+}, 500);
+}
+function setupRealtimeListeners() {
+if (balanceListener) db.ref('users/' + state.userId + '/balance').off('value', balanceListener); balanceListener = db.ref('users/' + state.userId + '/balance').on('value', snap => { if (snap.val() !== null && state.initialized && state.dataLoaded) { const newBalance = Number(snap.val()); if (!isNaN(newBalance) && isFinite(newBalance) && newBalance >= 0) { state.balance = newBalance; updateBalanceUI(); updateSwapUI(); } } });
+if (referralListener) db.ref('users/' + state.userId + '/referrals').off('value', referralListener); referralListener = db.ref('users/' + state.userId + '/referrals').on('value', snap => { if (snap.val() !== null) { const newReferrals = Number(snap.val()); if (!isNaN(newReferrals)) { state.referrals = newReferrals; updateReferralUI(); updateTierProgress(); } } });
+if (tonBalanceListener) db.ref('users/' + state.userId + '/tonBalance').off('value', tonBalanceListener); tonBalanceListener = db.ref('users/' + state.userId + '/tonBalance').on('value', snap => { if (snap.val() !== null && state.initialized && state.dataLoaded) { const newTonBalance = Number(snap.val()); if (!isNaN(newTonBalance) && isFinite(newTonBalance) && newTonBalance >= 0) { if (newTonBalance > state.tonBalance + 0.01 && state.isWithdrawalRestricted) { unrestrictWithdrawal(); } state.tonBalance = newTonBalance; updateTonUI(); updateModuleShopUI(); } } });
+}
+// --- UI UPDATES ---
+function updateAllUI() { updateBalanceUI(); updateReferralUI(); updateAdStatsUI(); updateTierProgress(); renderAnnouncements(); renderTasks(); updateLifetimeUptimeUI(); }
+function updateBalanceUI() { document.getElementById('displayBalance').textContent = state.balance.toFixed(3); document.getElementById('walletBalance').textContent = state.balance.toFixed(3); document.getElementById('usdValue').textContent = '$' + (state.balance * 0.005).toFixed(4); document.getElementById('displayStreak').textContent = state.streak; document.getElementById('displayTon').textContent = state.tonBalance.toFixed(5) + ' TON'; }
+function updateReferralUI() { document.getElementById('refCount').textContent = state.referrals; document.getElementById('refEarnings').textContent = state.totalReferralCommission.toFixed(0); }
+function updateAdStatsUI() { document.getElementById('adStatToday').textContent = state.adStats.today || 0; document.getElementById('adStatYesterday').textContent = state.adStats.yesterday || 0; document.getElementById('adStatWeek').textContent = state.adStats.thisWeek || 0; document.getElementById('adStatMonth').textContent = state.adStats.thisMonth || 0; }
+// --- REFERRAL SYSTEM ---
+function updateReferralLink() { const link = `https://t.me/LumenBeam_bot/start?startapp=${state.userId}`; document.getElementById('referralLinkDisplay').textContent = link; }
+function processStartParam() { const startParam = tg.initDataUnsafe?.start_param; if (startParam && startParam !== state.userId && !state.referredBy && state.isNewUser) { db.ref('users/' + startParam).once('value').then(snap => { if (snap.exists()) { const referrerData = snap.val(); showReferralWelcome(startParam, referrerData).then(() => { state.referredBy = startParam; db.ref('users/' + state.userId + '/referredBy').set(startParam); db.ref('users/' + startParam).transaction(userData => { if (!userData) return userData; userData.balance = validateNumber(userData.balance, 0) + REFERRAL_BONUS; userData.referrals = validateNumber(userData.referrals, 0) + 1; const tier = getCommissionTierForReferrals(userData.referrals || 0); const commission = Math.floor(REFERRAL_BONUS * (tier.commission / 100)); userData.totalReferralCommission = validateNumber(userData.totalReferralCommission, 0) + commission; return userData; }); notify(`Welcome! You received ${REFERRAL_BONUS} LMB.`); }); } }); } }
+function showReferralWelcome(referrerId, referrerData) { return new Promise((resolve) => { document.getElementById('referrerAvatar').src = referrerData.avatar || "https://i.postimg.cc/g0QywJ0x/1778750934.png"; document.getElementById('referrerName').textContent = referrerData.name || 'Unknown'; document.getElementById('referrerId').textContent = 'ID: ' + referrerId; const welcomeScreen = document.getElementById('referral-welcome'); welcomeScreen.style.display = 'flex'; let countdown = 3; const interval = setInterval(() => { countdown--; if (countdown > 0) { document.getElementById('welcomeCountdown').textContent = `Initializing in ${countdown}s...`; } else { clearInterval(interval); welcomeScreen.style.display = 'none'; resolve(); } }, 1000); }); }
+function getCommissionTier() { const tiers = [{ min: 0, commission: 5 }, { min: 25, commission: 10 }, { min: 50, commission: 15 }, { min: 100, commission: 20 }]; for (let i = tiers.length - 1; i >= 0; i--) { if (state.referrals >= tiers[i].min) return tiers[i]; } return tiers[0]; }
+function getCommissionTierForReferrals(refCount) { const tiers = [{ min: 0, commission: 5 }, { min: 25, commission: 10 }, { min: 50, commission: 15 }, { min: 100, commission: 20 }]; for (let i = tiers.length - 1; i >= 0; i--) { if (refCount >= tiers[i].min) return tiers[i]; } return tiers[0]; }
+function updateTierProgress() { const tier = getCommissionTier(), tiers = [{ min: 0, commission: 5 }, { min: 25, commission: 10 }, { min: 50, commission: 15 }, { min: 100, commission: 20 }], nextTier = tiers.find(t => t.min > tier.min); document.getElementById('tierCommission').textContent = `${tier.commission}%`; if (nextTier) { const progress = ((state.referrals - tier.min) / (nextTier.min - tier.min)) * 100; document.getElementById('tierProgress').style.width = `${Math.min(progress, 100)}%`; document.getElementById('tierProgressText').textContent = `${state.referrals}/${nextTier.min} operatives`; } else { document.getElementById('tierProgress').style.width = '100%'; document.getElementById('tierProgressText').textContent = 'MAX TIER REACHED'; } }
+// --- REFERRAL LIST ---
+function renderReferralList() { db.ref('users').orderByChild('referredBy').equalTo(state.userId).once('value').then(snap => { const refList = document.getElementById('referralList'); if (!refList) return; state.referrals = snap.numChildren(); updateReferralUI(); updateTierProgress(); if (snap.numChildren() === 0) { refList.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-dim);">No operatives yet</div>'; return; } let html = ''; snap.forEach(child => { const u = child.val(), tier = getCommissionTier(), userBalance = typeof u.balance === 'number' ? u.balance : 0, userTonBalance = typeof u.tonBalance === 'number' ? u.tonBalance : 0, commission = Math.floor(userBalance * (tier.commission / 100)); html += `<div style="background:var(--bg-card); backdrop-filter:var(--glass); border:1px solid var(--border); border-radius:var(--radius-md); padding:14px; margin-bottom:10px; display:flex; align-items:center; gap:14px;"><img src="${u.avatar || 'https://i.postimg.cc/g0QywJ0x/1778750934.png'}" style="width:48px; height:48px; border-radius:50%; border:2px solid var(--primary);"><div style="flex:1;"><div style="font-size:14px; color:var(--text-primary);">${u.name || 'Unknown'}</div><div style="font-size:10px; color:var(--text-dim);">ID: ${child.key}</div><div style="font-size:13px; color:var(--primary);">${userBalance.toFixed(2)} LMB | TON: ${userTonBalance.toFixed(2)}</div><div style="font-size:11px; color:var(--accent);">Commission: ${commission} LMB</div></div></div>`; }); refList.innerHTML = html; }); }
+// --- ADS SYSTEM - UPDATED MONETAG ---
+function resetAdStatsIfNeeded() { const today = getToday(), weekStart = getWeekStart(), monthStart = getMonthStart(); if (state.adStats.lastAdDate !== today) { state.adStats.yesterday = state.adStats.today; state.adStats.today = 0; state.adStats.lastAdDate = today; } if (state.adStats.lastWeekReset !== weekStart) { state.adStats.thisWeek = 0; state.adStats.lastWeekReset = weekStart; } if (state.adStats.lastMonthReset !== monthStart) { state.adStats.thisMonth = 0; state.adStats.lastMonthReset = monthStart; } }
+function watchAd() {
+triggerHaptic();
+if (adLoading) { notify("Please wait..."); return; }
+adLoading = true;
+resetAdStatsIfNeeded();
+document.getElementById('btnWatchAd').textContent = "LOADING...";
+document.getElementById('btnWatchAd').disabled = true;
+const adTimeout = setTimeout(() => {
+if (adLoading) {
+adLoading = false;
+document.getElementById('btnWatchAd').textContent = "INITIATE RECHARGE";
+document.getElementById('btnWatchAd').disabled = false;
+notify("Ad timeout. Try again.");
+}
+}, 45000);
+// UPDATED: Using new Monetag SDK function show_11049678
+if (typeof show_11049678 === 'function') {
+show_11049678().then(() => {
+clearTimeout(adTimeout);
+adLoading = false;
+document.getElementById('btnWatchAd').textContent = "INITIATE RECHARGE";
+document.getElementById('btnWatchAd').disabled = false;
+const reward = AD_REWARD;
+db.ref('users/' + state.userId + '/balance').transaction(current => validateNumber(current, 0) + reward);
+state.adStats.today = (state.adStats.today || 0) + 1;
+state.adStats.thisWeek = (state.adStats.thisWeek || 0) + 1;
+state.adStats.thisMonth = (state.adStats.thisMonth || 0) + 1;
+state.adStats.lifetime = (state.adStats.lifetime || 0) + 1;
+saveUserData(true);
+updateBalanceUI();
+updateAdStatsUI();
+notify(`+${reward} LMB from ad!`);
+}).catch((err) => {
+clearTimeout(adTimeout);
+console.error("Ad error:", err);
+adLoading = false;
+document.getElementById('btnWatchAd').textContent = "INITIATE RECHARGE";
+document.getElementById('btnWatchAd').disabled = false;
+notify("Ad failed. Try again.");
+});
+} else {
+clearTimeout(adTimeout);
+adLoading = false;
+document.getElementById('btnWatchAd').textContent = "INITIATE RECHARGE";
+document.getElementById('btnWatchAd').disabled = false;
+notify("Ad service unavailable");
+}
+}
+function startMonetagAds() {
+setInterval(() => {
+if (document.visibilityState === 'visible' && typeof show_11049678 === 'function' && !adLoading) {
+show_11049678().catch(()=>{});
+}
+}, 300000);
+}
+// --- SPIN WHEEL ---
+let isSpinning = false; const SPIN_REWARDS = [0, 50, 100, 200, 0, 500, 1000, 0];
+function updateSpinButtonState() { const btn = document.getElementById('btnSpinAction'); if (!btn) return; const today = new Date().toDateString(), lastSpinDate = state.lastSpin ? new Date(state.lastSpin * 1000).toDateString() : null; if (lastSpinDate === today) { btn.disabled = true; btn.style.opacity = "0.5"; btn.style.cursor = "not-allowed"; } else { btn.disabled = false; btn.style.opacity = "1"; btn.style.cursor = "pointer"; } }
+function openSpinWheel() { triggerHaptic(); const today = new Date().toDateString(); if (new Date(state.lastSpin * 1000).toDateString() === today) { notify("Already spun today"); return; } document.getElementById('modalSpin').style.display = 'flex'; drawWheel(); updateSpinButtonState(); }
+function drawWheel(rotation = 0) { const canvas = document.getElementById('spinCanvas'); if (!canvas) return; const ctx = canvas.getContext('2d'), cx = canvas.width / 2, cy = canvas.height / 2, radius = 90, step = 2 * Math.PI / SPIN_REWARDS.length; ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.save(); ctx.translate(cx, cy); ctx.rotate(rotation); ctx.translate(-cx, -cy); for (let i = 0; i < SPIN_REWARDS.length; i++) { ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, radius, i * step, (i + 1) * step); ctx.fillStyle = ["#00f3ff", "#bc13fe", "#ff003c", "#0aff68", "#ffee00", "#00f3ff", "#ff003c", "#bc13fe"][i]; ctx.fill(); ctx.strokeStyle = '#000'; ctx.stroke(); ctx.fillStyle = '#000'; ctx.font = "700 11px 'Orbitron'"; ctx.save(); ctx.translate(cx, cy); ctx.rotate(i * step + step / 2); ctx.textAlign = "right"; ctx.fillText(SPIN_REWARDS[i] > 0 ? SPIN_REWARDS[i] : "MISS", radius - 10, 5); ctx.restore(); } ctx.restore(); }
+function spinWheel() { triggerHaptic(); if (isSpinning) return; isSpinning = true; const resultEl = document.getElementById('spinResult'); resultEl.textContent = ""; const resIdx = Math.floor(Math.random() * SPIN_REWARDS.length), prize = SPIN_REWARDS[resIdx], stepAngle = (2 * Math.PI) / SPIN_REWARDS.length, targetAngle = (2 * Math.PI) - (resIdx * stepAngle) - (stepAngle / 2) - (Math.PI / 2), spins = 5 * 2 * Math.PI, totalRotation = spins + targetAngle; let start = null, duration = 4000; function animate(timestamp) { if (!start) start = timestamp; const elapsed = timestamp - start, progress = Math.min(elapsed / duration, 1), easeOut = 1 - Math.pow(1 - progress, 3), currentRotation = totalRotation * easeOut; drawWheel(currentRotation); if (progress < 1) { requestAnimationFrame(animate); } else { isSpinning = false; state.lastSpin = now(); if (prize > 0) { db.ref('users/' + state.userId + '/balance').transaction(current => validateNumber(current, 0) + prize); resultEl.textContent = `+${prize} LMB Won!`; notify(`Won ${prize} LMB!`); } else { resultEl.textContent = "Try again!"; notify("No prize this time"); } saveUserData(true); updateBalanceUI(); updateSpinButtonState(); } } requestAnimationFrame(animate); }
+// --- TON CONNECT ---
+async function initTonConnect() { try { tonConnectUI = new TON_CONNECT_UI.TonConnectUI({ manifestUrl: 'https://lumenbeam.vercel.app/tonconnect-manifest.json', buttonRootId: null }); tonConnectUI.onStatusChange(wallet => { if (wallet) { state.tonConnected = true; state.tonAddress = wallet.account.address; saveUserData(true); updateTonUI(); updateModuleShopUI(); if (manualConnectTriggered) { notify("Wallet connected!"); manualConnectTriggered = false; } } else { state.tonConnected = false; state.tonAddress = null; updateTonUI(); updateModuleShopUI(); } }); } catch (e) { console.error("TON Init Error", e); } }
+function connectTon() { triggerHaptic(); if (tonConnectUI) { manualConnectTriggered = true; tonConnectUI.connectWallet(); } }
+function disconnectTon() { triggerHaptic(); if (tonConnectUI) { tonConnectUI.disconnect(); state.tonConnected = false; state.tonAddress = null; saveUserData(true); updateTonUI(); updateModuleShopUI(); } }
+function updateTonUI() {
+const btn = document.getElementById('btnConnectTon'),
+discBtn = document.getElementById('btnDisconnectTon'),
+info = document.getElementById('tonWalletInfo'),
+addr = document.getElementById('tonAddressDisplay'),
+balanceDisplay = document.getElementById('tonBalanceDisplay');
+if (!btn || !info || !addr || !balanceDisplay) return;
+if (state.tonConnected && state.tonAddress) {
+btn.style.display = 'none';
+if(discBtn) discBtn.style.display = 'block';
+info.style.display = 'block';
+addr.textContent = state.tonAddress;
+balanceDisplay.textContent = state.tonBalance.toFixed(5) + ' TON';
+document.getElementById('depositQrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${DEPOSIT_WALLET}`;
+document.getElementById('depositAddressBox').textContent = DEPOSIT_WALLET;
+document.getElementById('depositQrCode2').src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${DEPOSIT_WALLET}`;
+document.getElementById('depositAddressBox2').textContent = DEPOSIT_WALLET;
+document.getElementById('memoUserId2').textContent = state.userId;
+} else {
+btn.style.display = 'block';
+if(discBtn) discBtn.style.display = 'none';
+info.style.display = 'none';
+}
+}
+function updateModuleShopUI() { if (document.getElementById('view-workshop').classList.contains('active')) renderModuleStore(); }
+// --- TRANSFER & TON SEND ---
+function executeTransfer() { triggerHaptic(); const to = document.getElementById('transferTo').value.trim(), amt = parseFloat(document.getElementById('transferAmount').value); if (!to || !amt || amt > state.balance) { notify("Invalid transfer"); return; } db.ref('users/' + to).once('value').then(snap => { if (!snap.exists()) { notify("Recipient not found"); return; } db.ref('users/' + state.userId + '/balance').transaction(current => { if (current < amt) return null; return current - amt; }).then(result => { if (result.committed) { state.balance -= amt; db.ref('users/' + to + '/balance').transaction(b => validateNumber(b, 0) + amt); saveUserData(true); updateBalanceUI(); closeModal('modalTransfer'); notify("Transfer complete!"); } else { notify("Transfer failed - insufficient balance"); } }); }); }
+function submitTonWithdrawal() { triggerHaptic(); if (!checkWithdrawalRestriction()) { return; } const recipient = document.getElementById('tonRecipientAddress').value.trim(), amount = parseFloat(document.getElementById('tonAmount').value), memo = document.getElementById('tonMemo')?.value?.trim() || ''; if (!recipient || isNaN(amount) || amount <= 0) { notify("Invalid details"); return; } if (amount > state.tonBalance) { notify("Insufficient balance"); return; } const limit = state.lastDepositTimestamp > 0 ? MAX_FREE_WITHDRAWALS : INITIAL_FREE_WITHDRAWALS; if (state.freeWithdrawalsUsed >= limit) { state.isWithdrawalRestricted = true; notify("Account restricted - can't withdraw now. Deposit to unrestrict your account"); saveUserData(true); return; } state.freeWithdrawalsUsed++; const requestId = `req_${now()}_${Math.random().toString(36).substr(2, 9)}`, withdrawalRequest = { id: requestId, userId: state.userId, address: recipient, amount: amount, memo: memo, status: 'pending', timestamp: nowMs() }; state.tonBalance -= amount; if (!state.withdrawalRequests) state.withdrawalRequests = []; state.withdrawalRequests.push(withdrawalRequest); saveUserData(true); updateBalanceUI(); updateTonUI(); closeModal('modalTonSend'); db.ref('admin/withdrawal_requests/' + requestId).set(withdrawalRequest); notify(`Withdrawal request for ${amount} TON submitted! Pending admin approval.`); }
+function setMaxTon() { document.getElementById('tonAmount').value = state.tonBalance.toFixed(5); }
+function openBCDepositModal() { triggerHaptic(); if (!state.tonConnected) { notify("Connect wallet first"); return; } document.getElementById('modalBCDeposit').style.display = 'flex'; }
+function setBCDepositAmount(amount) { document.getElementById('bcDepositAmount').value = amount; }
+async function confirmBCDeposit() { triggerHaptic(); const amount = parseFloat(document.getElementById('bcDepositAmount').value); if (isNaN(amount) || amount < 1) { notify("Minimum deposit is 1 TON"); return; } try { const amountNano = Math.floor(amount * 1e9).toString(), transaction = { messages: [{ address: DEPOSIT_WALLET, amount: amountNano }] }; notify("Processing deposit transaction..."); await tonConnectUI.sendTransaction(transaction); unrestrictWithdrawal(); state.tonBalance += amount; saveUserData(true); updateBalanceUI(); updateTonUI(); updateModuleShopUI(); closeModal('modalBCDeposit'); notify(`Deposit of ${amount} TON successful!`); } catch (e) { console.error("BC Deposit error:", e); notify("Transaction failed"); } }
+// --- SWAP SYSTEM ---
+function openSwapView() { triggerHaptic(); switchView('swap'); updateSwapUI(); }
+function updateSwapUI() { const earnedBalance = Math.max(0, state.balance - (state.presaleTokens || 0)); document.getElementById('swapLmbBalance').textContent = state.balance.toFixed(3) + ' LMB'; document.getElementById('swapEarnedDisplay').textContent = earnedBalance.toFixed(3); document.getElementById('swapPresaleDisplay').textContent = (state.presaleTokens || 0).toFixed(3); calculateSwap(); }
+function calculateSwap() { const earnedBalance = Math.max(0, state.balance - (state.presaleTokens || 0)), essAmount = parseFloat(document.getElementById('swapInput').value) || 0, tonAmount = essAmount * SWAP_RATE; document.getElementById('swapResult').textContent = tonAmount.toFixed(6) + ' TON'; document.getElementById('btnConfirmSwap').disabled = essAmount <= 0 || essAmount > earnedBalance; }
+function setMaxSwap() { const earnedBalance = Math.max(0, state.balance - (state.presaleTokens || 0)); document.getElementById('swapInput').value = earnedBalance; calculateSwap(); }
+async function confirmSwap() { triggerHaptic(); const earnedBalance = Math.max(0, state.balance - (state.presaleTokens || 0)), essAmount = parseFloat(document.getElementById('swapInput').value); if (!essAmount || essAmount <= 0 || essAmount > earnedBalance) { notify("Invalid swap amount or insufficient earned tokens"); return; } const tonAmount = essAmount * SWAP_RATE; state.balance -= essAmount; state.tonBalance += tonAmount; await db.ref('users/' + state.userId).update({ balance: state.balance, tonBalance: state.tonBalance }); updateBalanceUI(); updateTonUI(); updateModuleShopUI(); updateSwapUI(); document.getElementById('swapInput').value = ''; document.getElementById('swapResult').textContent = '0.000000 TON'; notify(`Swapped ${essAmount.toFixed(3)} LMB for ${tonAmount.toFixed(6)} TON!`); }
+// --- HOLD LMB SYSTEM ---
+function openHoldView() { triggerHaptic(); switchView('holdlmb'); updateHoldUI(); }
+function updateHoldUI() { document.getElementById('holdAvailableBalance').textContent = state.balance.toFixed(3); document.getElementById('displayHeldBalance').textContent = (state.heldBalance || 0).toFixed(3); document.getElementById('holdEstimatedValue').textContent = '$' + ((state.heldBalance || 0) * 0.005).toFixed(4); calculateHold(); calculateUnhold(); }
+function calculateHold() { const amt = parseFloat(document.getElementById('holdAmountInput').value) || 0, btn = document.getElementById('btnExecuteHold'); btn.disabled = amt <= 0 || amt > state.balance; }
+function setMaxHold() { document.getElementById('holdAmountInput').value = state.balance; calculateHold(); }
+async function executeHold() { triggerHaptic(); const amt = parseFloat(document.getElementById('holdAmountInput').value); if (amt <= 0 || amt > state.balance) { notify("Invalid amount"); return; } state.balance -= amt; if (!state.heldBalance) state.heldBalance = 0; state.heldBalance += amt; await db.ref('users/' + state.userId).update({ balance: state.balance, heldBalance: state.heldBalance }); updateBalanceUI(); updateHoldUI(); document.getElementById('holdAmountInput').value = ''; const heldEl = document.getElementById('displayHeldBalance'); heldEl.classList.add('success'); setTimeout(() => heldEl.classList.remove('success'), 600); notify(`Successfully held ${amt.toFixed(3)} LMB!`); }
+function calculateUnhold() { const amt = parseFloat(document.getElementById('unholdAmountInput').value) || 0, btn = document.getElementById('btnExecuteUnhold'); btn.disabled = true; }
+function setMaxUnhold() { document.getElementById('unholdAmountInput').value = state.heldBalance || 0; calculateUnhold(); }
+function executeUnhold() { notify("Unholding will be enabled after official listing."); }
+// --- VIEW SWITCHING WITH TELEGRAM BACKBUTTON ---
+function switchView(viewId) {
+if (isViewTransitioning) return; isViewTransitioning = true; triggerHaptic();
+const overlay = document.getElementById('viewTransitionOverlay'), transitionText = document.getElementById('transitionText'); overlay.classList.add('active');
+const viewNames = { 'hq': 'Loading Base...', 'missions': 'Loading Missions...', 'workshop': 'Loading Workshop...', 'vault': 'Loading Vault...', 'network': 'Loading Network...', 'ranking': 'Loading Rankings...', 'settings': 'Loading Settings...', 'swap': 'Loading Swap...', 'holdlmb': 'Loading Hold LMB...', 'nft': 'Loading NFT Staking...', 'presale': 'Loading Presale...', 'mintgame': 'Loading Mint Game...', 'blocks': 'Loading Block Registry...' };
+transitionText.textContent = viewNames[viewId] || 'Loading...';
+document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); document.querySelectorAll('.hud-item').forEach(el => el.classList.remove('active'));
+const appContainer = document.querySelector('.app-container'); appContainer.classList.add('transitioning');
+// Update Telegram BackButton visibility
+updateBackButtonVisibility(viewId);
+setTimeout(() => {
+const view = document.getElementById('view-' + viewId); if (view) view.classList.add('active');
+const navItems = document.querySelectorAll('.hud-item'), map = { 'hq': 0, 'missions': 1, 'network': 2, 'vault': 3, 'ranking': 4, 'settings': 5, 'workshop': 1, 'swap': 3, 'holdlmb': 3, 'nft': 3, 'presale': 3, 'mintgame': 0, 'blocks': 0 };
+if (navItems[map[viewId]]) navItems[map[viewId]].classList.add('active');
+if (viewId === 'ranking') renderRanking(); if (viewId === 'network') renderReferralList(); if (viewId === 'settings') { updatePreferenceButtons(); } if (viewId === 'missions') renderTasks(); if (viewId === 'workshop') renderModuleStore(); if (viewId === 'swap') updateSwapUI(); if (viewId === 'holdlmb') updateHoldUI(); if (viewId === 'nft') { renderNFTs(); updateTotalStakedValue(); } if (viewId === 'presale') updatePresaleFromSlider(); if (viewId === 'mintgame') initMintGrid(); if (viewId === 'blocks') renderBlocksGallery();
+appContainer.classList.remove('transitioning'); overlay.classList.remove('active'); isViewTransitioning = false;
+}, 300);
+}
+// --- PRESALE LOGIC ---
+function updatePresaleFromSlider() { const slider = document.getElementById('presaleSlider'); if (!slider) return; const tonAmt = parseFloat(slider.value), essAmt = Math.floor(tonAmt / PRESALE_PRICE_PER_LMB); document.getElementById('presaleTonDisplay').textContent = tonAmt.toFixed(3); document.getElementById('presaleLmbDisplay').textContent = essAmt.toLocaleString(); }
+async function executePresalePayment() { triggerHaptic(); if (state.tonBalance < 0.1) { notify("Insufficient in-game TON balance! Minimum 0.1 TON required."); return; } const tonAmt = parseFloat(document.getElementById('presaleSlider').value), essAmt = Math.floor(tonAmt / PRESALE_PRICE_PER_LMB); if (!state.presaleTokens) state.presaleTokens = 0; state.presaleTokens += essAmt; state.balance += essAmt; state.tonBalance -= tonAmt; await db.ref('users/' + state.userId).update({ balance: state.balance, presaleTokens: state.presaleTokens, tonBalance: state.tonBalance }); updateTonUI(); updateBalanceUI(); updateSwapUI(); notify(`Successfully purchased ${essAmt.toLocaleString()} LMB (Presale)! Tokens added to balance but locked for swapping.`); document.getElementById('presaleSlider').value = MIN_TON_AMOUNT; updatePresaleFromSlider(); }
+// --- AVATAR UNLOCK ---
+async function unlockRankingAvatar() {
+triggerHaptic();
+if (state.tonBalance < 1) { notify("Insufficient TON! You need at least 1 TON."); return; }
+if (state.rankingAvatarUnlocked) { notify("Avatar already unlocked."); return; }
+if (!confirm("Unlock your avatar on the ranking for 1 TON?")) return;
+try {
+state.tonBalance -= 1;
+state.rankingAvatarUnlocked = true;
+await db.ref('users/' + state.userId).update({ tonBalance: state.tonBalance, rankingAvatarUnlocked: true });
+updateTonUI();
+document.getElementById('btnUnlockAvatar').style.display = 'none';
+document.getElementById('avatarStatus').style.display = 'block';
+notify("Avatar Unlocked! It will now appear in the Global Leaderboard.");
+} catch (e) {
+state.tonBalance += 1;
+notify("Unlock failed. Please try again.");
+}
+}
+// --- ADMIN & TASKS ---
+function loadAdminData() { db.ref('admin/tasks').once('value').then(snap => { if (snap.exists()) { tasks = []; snap.forEach(c => { const t = c.val(); t.id = c.key; tasks.push(t); }); } else { tasks = []; } renderTasks(); }); db.ref('admin/withdrawal_requests').orderByChild('userId').equalTo(state.userId).on('value', snap => { if (!snap.exists()) return; const updates = []; snap.forEach(child => { const req = child.val(), existingReq = state.withdrawalRequests.find(r => r.id === child.key); if (existingReq && existingReq.status !== req.status) { existingReq.status = req.status; updates.push(existingReq); if (req.status === 'rejected') { state.tonBalance += req.amount; db.ref('users/' + state.userId + '/tonBalance').set(state.tonBalance); updateTonUI(); updateModuleShopUI(); notify(`Withdrawal of ${req.amount} TON was rejected. Balance refunded.`); } else if (req.status === 'approved') { notify(`Withdrawal of ${req.amount} TON approved!`); } } }); if (updates.length > 0) saveUserData(true); }); renderMarket(); renderRanking(); renderReferralList(); }
+function switchTaskTab(tab) { triggerHaptic(); state.currentTaskTab = tab; document.getElementById('tabAvailable').classList.toggle('active', tab === 'available'); document.getElementById('tabCompleted').classList.toggle('active', tab === 'completed'); renderTasks(); }
+function renderTasks() { const container = document.getElementById('tasksContainer'); if (!container) return; container.innerHTML = ''; const filteredTasks = tasks.filter(task => { const isCompleted = state.completedTasks && state.completedTasks[task.id]; return state.currentTaskTab === 'available' ? !isCompleted : isCompleted; }); if (filteredTasks.length === 0) { container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-dim);">${state.currentTaskTab === 'available' ? 'No available quests' : 'No completed quests yet'}</div>`; return; } filteredTasks.forEach(task => { const isCompleted = state.completedTasks && state.completedTasks[task.id], div = document.createElement('div'); div.className = 'task-card'; div.innerHTML = `<img src="${task.image || 'https://i.postimg.cc/g0QywJ0x/1778750934.png'}" class="task-image" alt="${task.name}"><div class="task-content"><div class="task-title">${task.name}</div><div class="task-desc">+${task.reward} LMB</div></div><button class="task-action ${isCompleted ? 'completed' : ''}" onclick="handleTask('${task.id}', '${task.link}', ${task.reward})">${isCompleted ? 'DONE' : 'START'}</button>`; container.appendChild(div); }); }
+function handleTask(id, link, reward) { triggerHaptic(); if (link) window.open(link, '_blank'); if (!state.completedTasks) state.completedTasks = {}; if (!state.completedTasks[id]) {
+state.completedTasks[id] = true;
+// IMMEDIATELY save to database to prevent glitch on quick exit/reopen
+db.ref('users/' + state.userId).update({ completedTasks: state.completedTasks });
+db.ref('users/' + state.userId + '/balance').transaction(current => validateNumber(current, 0) + reward);
+saveUserData(true);
+updateBalanceUI();
+notify("Quest completed! +" + reward + " LMB");
+} else {
+notify("Quest already completed - link opened");
+}
+renderTasks(); }
+// --- MARKET ---
+const marketCoins = [ { symbol: 'LMB', price: 0.005, change: 0.15, history: [] }, { symbol: 'TON', price: 5.42, change: 1.2, history: [] }, { symbol: 'BTC', price: 84500, change: -0.5, history: [] }, { symbol: 'ETH', price: 3180, change: 0.8, history: [] }, { symbol: 'SOL', price: 178, change: 2.1, history: [] } ];
+marketCoins.forEach(c => { for (let i = 0; i < 20; i++) c.history.push(c.price); });
+async function fetchCryptoPrices() { try { const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network,bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true'), data = await response.json(); if (data['the-open-network']) { marketCoins[1].price = data['the-open-network'].usd; marketCoins[1].change = data['the-open-network'].usd_24h_change || 0; } if (data.bitcoin) { marketCoins[2].price = data.bitcoin.usd; marketCoins[2].change = data.bitcoin.usd_24h_change || 0; } if (data.ethereum) { marketCoins[3].price = data.ethereum.usd; marketCoins[3].change = data.ethereum.usd_24h_change || 0; } if (data.solana) { marketCoins[4].price = data.solana.usd; marketCoins[4].change = data.solana.usd_24h_change || 0; } renderMarket(); } catch (e) { console.error("Failed to fetch crypto prices:", e); } }
+function renderMarket() { const container = document.getElementById('marketList'); if (!container) return; let html = ''; marketCoins.forEach(c => { const color = c.change >= 0 ? 'var(--success)' : 'var(--danger)'; html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.06);"><div><span style="font-family:'Orbitron'; color:var(--text-primary);">${c.symbol}</span></div><div style="text-align:right;"><div style="font-family:'Orbitron'; color:var(--text-primary);">$${c.price.toFixed(c.symbol === 'LMB' ? 4 : 2)}</div><div style="font-size:11px; padding:3px 8px; border-radius:var(--radius-full); color:${color}; background:${c.change >= 0 ? 'rgba(10,255,104,0.18)' : 'rgba(255,0,60,0.18)'};">${c.change >= 0 ? '+' : ''}${c.change.toFixed(2)}%</div></div></div>`; }); container.innerHTML = html; }
+function startMarketEngine() { fetchCryptoPrices(); setInterval(() => { marketCoins.forEach(c => { if (c.symbol === 'LMB') return; const volatility = c.price * 0.002, change = (Math.random() - 0.5) * volatility; c.price += change; c.history.push(c.price); if (c.history.length > 20) c.history.shift(); c.change = ((c.price - c.history[0]) / c.history[0]) * 100; }); renderMarket(); }, 3000); }
+// --- RANKING ---
+function renderRanking() { const container = document.getElementById('rankingListContainer'); if (!container) return; db.ref('users').once('value').then(snap => { const allUsers = []; snap.forEach(child => { const u = child.val(); allUsers.push({ id: child.key, name: u.name || 'Anon', avatar: u.avatar || 'https://i.postimg.cc/g0QywJ0x/1778750934.png', balance: typeof u.balance === 'number' ? u.balance : 0 }); }); allUsers.sort((a, b) => b.balance - a.balance); const myIndex = allUsers.findIndex(u => u.id === state.userId); document.getElementById('myRank').textContent = myIndex !== -1 ? `#${myIndex + 1}` : '#--'; const displayUsers = allUsers.slice(0, 25); let html = ''; displayUsers.forEach((u, i) => { let rankClass = ''; if (i === 0) rankClass = 'rank-1'; else if (i === 1) rankClass = 'rank-2'; else if (i === 2) rankClass = 'rank-3';
+// Hide avatars by default. Only show if user unlocked it and it's their own entry.
+let avatarHtml = '<div class="rank-avatar">👤</div>';
+if (state.rankingAvatarUnlocked && u.id === state.userId) {
+avatarHtml = `<img src="${u.avatar}" class="rank-avatar">`;
+}
+html += `<div class="ranking-item ${rankClass}"><div class="rank-number ${rankClass}">${i + 1}</div>${avatarHtml}<div class="rank-info"><div class="rank-name">${u.name}</div></div><div class="rank-score">${u.balance.toFixed(2)}</div></div>`;
+}); container.innerHTML = html; }); }
+// --- ANNOUNCEMENTS ---
+function renderAnnouncements() { const container = document.getElementById('announcementContainer'); if (!container) return; db.ref('admin/announcements').orderByChild('timestamp').limitToLast(3).once('value').then(snap => { let html = ''; snap.forEach(child => { const ann = child.val(); html += `<div style="background:rgba(188,89,254,0.12); border-left:4px solid var(--secondary); padding:14px 16px; margin-bottom:14px; border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><div style="font-family:'Orbitron'; font-size:13px; color:var(--secondary); margin-bottom:6px;">${ann.title}</div><div style="font-size:12px; color:var(--text-main); margin:4px 0;">${ann.message}</div><div style="font-size:10px; color:var(--text-dim);">${new Date(ann.timestamp).toLocaleString()}</div></div>`; }); container.innerHTML = html || ''; }); }
+// --- LIFETIME UPTIME ---
+function initLifetimeUptime() { const saved = localStorage.getItem('cyberLifetimeUptime'); if (saved) { try { const data = JSON.parse(saved); state.lifetimeUptimeSeconds = validateNumber(data.totalSeconds, 0); state.sessionCount = validateNumber(data.sessions, 0); } catch (e) { state.lifetimeUptimeSeconds = 0; state.sessionCount = 0; } } state.currentSessionStart = now(); state.sessionCount++; updateLifetimeUptimeUI(); setInterval(() => { state.lifetimeUptimeSeconds++; updateLifetimeUptimeUI(); saveLifetimeUptime(); }, 1000); }
+function saveLifetimeUptime() { localStorage.setItem('cyberLifetimeUptime', JSON.stringify({ totalSeconds: state.lifetimeUptimeSeconds, sessions: state.sessionCount, lastUpdate: now() })); }
+function formatUptime(seconds) { if (!seconds) return '0h 0m'; const h = Math.floor(seconds / 3600), m = Math.floor((seconds % 3600) / 60); return `${h}h ${m}m`; }
+function updateLifetimeUptimeUI() { const totalEl = document.getElementById('lifetimeUptime'), sessionsEl = document.getElementById('sessionCount'), avgEl = document.getElementById('avgSessionTime'); if (totalEl) totalEl.textContent = formatUptime(state.lifetimeUptimeSeconds); if (sessionsEl) sessionsEl.textContent = state.sessionCount; if (avgEl) { const avg = state.sessionCount > 0 ? Math.floor(state.lifetimeUptimeSeconds / state.sessionCount) : 0; avgEl.textContent = formatUptime(avg); } }
+// --- THEME ---
+function toggleTheme() {
+state.theme = state.theme === 'dark' ? 'light' : 'dark';
+applyTheme(state.theme);
+document.getElementById('themeToggleBtn').textContent = state.theme === 'dark' ? '🌙 DARK' : '☀️ LIGHT';
+saveUserData(true);
+}
+function applyTheme(mode) {
+if (mode === 'light') {
+document.documentElement.classList.add('light-theme');
+} else {
+document.documentElement.classList.remove('light-theme');
+}
+state.theme = mode;
+}
+// --- LANGUAGE ---
+const translations = { EN: { welcome_title: "WELCOME TO LUMEN BEAM", welcome_subtitle: "You've been invited to defend the protocol", your_referrer: "YOUR INVITER", online: "ONLINE", essence_yield: "Credit Yield", streak: "Bloom Streak", days: "DAYS", ton_balance: "TON Balance", daily_spin: "DAILY PROTOCOL SPIN", forest_quests: "Active Protocols", grove_verification: "PROTOCOL VERIFICATION", nature_pollen: "Energy Recharge", stream_desc: "Watch data streams to recharge shield generators and earn credits.", today: "TODAY", yesterday: "YESTERDAY", week: "WEEK", month: "MONTH", execute_stream: "INITIATE RECHARGE", forest_network: "Neural Network", uplink_code: "INVITE CODE", copy_uplink: "COPY ACCESS CODE", referral_tier: "OPERATIVE TIER", progress_next_tier: "Progress to next tier:", nodes: "OPERATIVES", commission: "COMMISSION", active_nodes: "ACTIVE OPERATIVES", essence_vault: "Secure Vault", nxs_balance: "LMB Balance", est_value: 'EST. VALUE: <span style="color:var(--accent);" id="usdValue">$0.00</span>', send: "SEND", receive: "RECEIVE", history: "HISTORY", ton_wallet: "TON Wallet", platform_deposit: "FOREST DEPOSIT ADDRESS", copy_address: "COPY ADDRESS", connect_ton: "CONNECT TON WALLET", global_market: "GLOBAL MARKET", global_rankings: "Global Leaderboard", your_position: "Your Position", id_label: 'ID: <span id="profileId">...</span>', reactor_theme: "THEME SELECTOR", nav_node: "BASE", nav_job: "OPS", nav_net: "NET", nav_vault: "VAULT", nav_rank: "RANK", nav_sys: "SETTINGS", transfer_assets: "TRANSFER LMB", recipient_id: "RECIPIENT USER ID", amount_nxs: "AMOUNT (LMB)", initiate_transfer: "INITIATE TRANSFER", receive_assets: "RECEIVE LMB", your_node_id: "YOUR OPERATIVE ID", copy_id: "COPY ID", tx_history: "Transaction History", loading_history: "Loading history...", send_ton: "WITHDRAW TON", recipient_ton: "Recipient TON Address", amount_ton: "Amount in TON", send_ton_btn: "WITHDRAW TON", quantum_spin: "PROTOCOL SPIN", spin: "SPIN", notification: "Notification", available_tasks: "Available Quests", completed_tasks: "Completed", seed_shop: "Module Workshop", seed_shop_desc: "Upgrade your defense grid with advanced modules", open_store: "EXPLORE", owned_skins: "My Modules", mining_packages: "Module Store", current_speed: "Total Mining" }, RU: { welcome_title: "ДОБРО ПОЖАЛОВАТЬ В LUMEN BEAM", online: "ОНЛАЙН", essence_yield: "Урожай Кредитов" } };
+function setLanguage(lang) { triggerHaptic(); if (!translations[lang]) return; state.language = lang; document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if (translations[lang][key]) el.innerHTML = translations[lang][key]; }); document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { const key = el.getAttribute('data-i18n-placeholder'); if (translations[lang][key]) el.placeholder = translations[lang][key]; }); if (state.initialized) saveUserData(true); renderTasks(); renderMarket(); renderRanking(); renderReferralList(); }
+// --- PREFERENCES & REDEEM ---
+function toggleHaptic() { state.hapticEnabled = !state.hapticEnabled; updatePreferenceButtons(); saveUserData(true); notify(`Haptic Feedback: ${state.hapticEnabled ? 'ON' : 'OFF'}`); }
+function toggleSound() { state.soundEnabled = !state.soundEnabled; if(state.soundEnabled) playTone(880, 0.1); updatePreferenceButtons(); saveUserData(true); notify(`Sound Effects: ${state.soundEnabled ? 'ON' : 'OFF'}`); }
+function updatePreferenceButtons() { const hBtn = document.getElementById('btnHapticToggle'), sBtn = document.getElementById('btnSoundToggle'); if(hBtn) { hBtn.textContent = state.hapticEnabled ? 'ON' : 'OFF'; hBtn.classList.toggle('success', state.hapticEnabled); } if(sBtn) { sBtn.textContent = state.soundEnabled ? 'ON' : 'OFF'; sBtn.classList.toggle('success', state.soundEnabled); } }
+async function redeemCodeAction() { triggerHaptic(); const codeInput = document.getElementById('redeemInput'), code = codeInput.value.trim().toUpperCase(), statusEl = document.getElementById('redeemStatus'); if (!code.match(/^[A-Z0-9]{6,12}$/)) { statusEl.textContent = "Invalid format (e.g., LMB456476)"; statusEl.style.color = "var(--danger)"; return; } statusEl.textContent = "Checking..."; statusEl.style.color = "var(--text-dim)"; try { const snap = await db.ref(`admin/redeem_codes/${code}`).once('value'); if (!snap.exists()) { statusEl.textContent = "Invalid or expired code"; statusEl.style.color = "var(--danger)"; return; } const data = snap.val(); if (data.claimedBy && data.claimedBy[state.userId]) { statusEl.textContent = "Already used by you"; statusEl.style.color = "var(--warning)"; return; } const reward = data.reward || 1000; await db.ref(`users/${state.userId}/balance`).transaction(b => (b || 0) + reward); await db.ref(`admin/redeem_codes/${code}/claimedBy/${state.userId}`).set(true); state.balance += reward; statusEl.textContent = `Success! +${reward} LMB claimed`; statusEl.style.color = "var(--success)"; notify(`Redeemed ${reward} LMB!`); updateBalanceUI(); saveUserData(true); codeInput.value = ''; } catch (e) { statusEl.textContent = "Network error. Try again."; statusEl.style.color = "var(--danger)"; } }
+// --- EVENT LISTENERS ---
+function setupEventListeners() { document.getElementById('btnDailySpin').addEventListener('click', openSpinWheel); document.getElementById('btnCopyLink').addEventListener('click', () => { triggerHaptic(); const link = `https://t.me/LumenBeam_bot/start?startapp=${state.userId}`; navigator.clipboard.writeText(link); notify("Link copied!"); }); document.getElementById('btnConnectTon').addEventListener('click', connectTon); document.getElementById('btnWatchAd').addEventListener('click', (e) => { e.preventDefault(); watchAd(); }); document.addEventListener('click', (e) => { if(e.target.matches('button, .hud-item, .task-card, .module-card')) triggerHaptic(); }); }
+// --- UTILS ---
+function openTransferModal() { triggerHaptic(); document.getElementById('modalTransfer').style.display = 'flex'; }
+function openReceiveModalLegacy() { triggerHaptic(); const qr = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=LUMEN-WALLET:${state.userId}`; document.getElementById('qrCode').src = qr; document.getElementById('receiveUserId').textContent = state.userId; document.getElementById('modalReceive').style.display = 'flex'; }
+function openHistoryModal() { triggerHaptic(); document.getElementById('modalHistory').style.display = 'flex'; loadTransactionHistory(); }
+function loadTransactionHistory() { const listContainer = document.getElementById('transactionList'); listContainer.innerHTML = '<div style="text-align:center; color:var(--text-dim); padding:24px;">No transactions yet</div>'; }
+function openTonHistoryModal() { triggerHaptic(); document.getElementById('modalTonHistory').style.display = 'flex'; loadTonTransactionHistory(); }
+function loadTonTransactionHistory() { const listContainer = document.getElementById('tonTransactionList'); if (!state.withdrawalRequests || state.withdrawalRequests.length === 0) { listContainer.innerHTML = '<div style="text-align:center; color:var(--text-dim); padding:24px;">No TON transactions yet</div>'; return; } let html = ''; state.withdrawalRequests.sort((a, b) => b.timestamp - a.timestamp).forEach(req => { const statusClass = req.status === 'approved' ? 'received' : req.status === 'rejected' ? 'rejected' : 'pending', iconClass = req.status === 'approved' ? 'received' : req.status === 'rejected' ? 'rejected' : 'pending', dateStr = new Date(req.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }); html += `<div class="tx-row"><div class="tx-info"><div class="tx-icon ${iconClass}">${req.status === 'approved' ? '✓' : req.status === 'rejected' ? '✗' : '⏳'}</div><div class="tx-details"><h4>Withdrawal Request</h4><p style="font-family:monospace; font-size:10px;">${req.address.substring(0, 8)}...${req.address.slice(-6)}</p><div style="margin-top:4px; font-size:10px; color:var(--text-dim);">📅 ${dateStr}</div><div class="tx-status ${statusClass}">${req.status.toUpperCase()}</div></div></div><div class="tx-amount ${statusClass}">${req.amount.toFixed(5)} TON</div></div>`; }); listContainer.innerHTML = html; }
+function copyUserId() { triggerHaptic(); navigator.clipboard.writeText(state.userId); notify("ID copied!"); }
+function copyDepositAddress() { triggerHaptic(); navigator.clipboard.writeText(DEPOSIT_WALLET); notify('Address copied'); }
+function copyTonDepositMemo() { triggerHaptic(); const memo = 'LUMEN' + state.userId; navigator.clipboard.writeText(memo); notify('Memo copied'); }
+function openTonSendModal() { triggerHaptic(); if (!state.tonConnected) { notify("Connect wallet first"); return; } document.getElementById('tonSendAvailableBalance').textContent = state.tonBalance.toFixed(5) + ' TON'; document.getElementById('tonMemo').value = state.userId; document.getElementById('modalTonSend').style.display = 'flex'; }
+function toggleTonDetails() { triggerHaptic(); const el = document.getElementById('tonDetailsExpand'); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
+function copyProfileId() { triggerHaptic(); if (state.userId) { navigator.clipboard.writeText(state.userId); notify("ID copied!"); } }
+// --- PARTICLES & BACKGROUND ---
+function initParticles() { const container = document.getElementById('particles'); if (!container) return; for (let i = 0; i < 30; i++) { const particle = document.createElement('div'); particle.className = 'particle'; particle.style.left = Math.random() * 100 + '%'; particle.style.animationDelay = Math.random() * 15 + 's'; particle.style.animationDuration = (15 + Math.random() * 10) + 's'; container.appendChild(particle); } }
+// --- GAME CANVAS ---
+function initGameCanvas() { const canvas = document.getElementById('gameCanvas'), ctx = canvas.getContext('2d'); let angle = 0; function resize() { canvas.width = canvas.parentElement.offsetWidth; canvas.height = canvas.parentElement.offsetHeight; } resize(); window.addEventListener('resize', resize); function draw() { ctx.clearRect(0, 0, canvas.width, canvas.height); const cx = canvas.width / 2, cy = canvas.height / 2, radius = Math.min(cx, cy) - 20; ctx.strokeStyle = 'rgba(0, 243, 255, 0.2)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2); ctx.stroke(); ctx.beginPath(); ctx.arc(cx, cy, radius * 0.6, 0, Math.PI * 2); ctx.stroke(); ctx.beginPath(); ctx.arc(cx, cy, radius * 0.3, 0, Math.PI * 2); ctx.stroke(); ctx.beginPath(); ctx.moveTo(cx - radius, cy); ctx.lineTo(cx + radius, cy); ctx.stroke(); ctx.beginPath(); ctx.moveTo(cx, cy - radius); ctx.lineTo(cx, cy + radius); ctx.stroke(); angle += 0.02; ctx.save(); ctx.translate(cx, cy); ctx.rotate(angle); const gradient = ctx.createLinearGradient(0, 0, radius, 0); gradient.addColorStop(0, 'rgba(0, 243, 255, 0)'); gradient.addColorStop(1, 'rgba(0, 243, 255, 0.5)'); ctx.fillStyle = gradient; ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, radius, -0.2, 0.2); ctx.fill(); ctx.restore(); const time = Date.now() * 0.001; for(let i=0; i<5; i++) { const r = radius * 0.8, a = time * 0.5 + (i * Math.PI * 2 / 5), x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r; ctx.fillStyle = '#ff003c'; ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2); ctx.fill(); } gameAnimationId = requestAnimationFrame(draw); } draw(); }
+// --- INIT ---
+function init() {
+document.getElementById('loaderText').textContent = "Initializing protocol...";
+const user = tg.initDataUnsafe?.user; if (!user) { console.error("No user data available"); document.getElementById('loaderText').textContent = "Error: No user data. Please open from Telegram."; return; }
+state.userId = user.id.toString(); state.telegramName = user.first_name || 'Operative';
+document.getElementById('profileId').textContent = state.userId; document.getElementById('profileName').textContent = state.telegramName; document.getElementById('profileAvatar').src = user.photo_url || "https://i.postimg.cc/g0QywJ0x/1778750934.png"; document.getElementById('memoUserId').textContent = state.userId;
+updateReferralLink(); initTonConnect(); loadUserData(); initParticles(); initGameCanvas();
+// Setup Telegram fullscreen and BackButton
+tg.enableClosingConfirmation();
+setupTelegramBackButton();
+}
+init();
+</script>
+</body>
+</html>
